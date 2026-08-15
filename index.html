@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tea Time</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <!-- Фонові зображеня -->
+        <img
+            class="background"
+            src="mountains.jpg"
+            alt=""
+        >
+
+        <!-- Верхній туман -->
+        <div class="fog-top"></div>
+
+
+        <!-- Верхняя часть -->
+        <header class="header">
+
+            <h1>
+                Скільки ви випили чаю?
+            </h1>
+
+            <p>
+                дізнайтесь це на нашому сайті
+            </p>
+
+        </header>
+
+
+        <!-- Перемикатель теми -->
+        <button
+            class="theme-button"
+            id="themeButton"
+            type="button"
+        >
+            ☀️
+        </button>
+
+
+        <!-- Погода -->
+        <section class="weather">
+
+            <span
+                class="weather-icon"
+                id="weatherIcon"
+            >
+                🌤️
+            </span>
+
+            <span
+                class="weather-text"
+                id="weatherText"
+            >
+                Завантаження погоди...
+            </span>
+
+        </section>
+
+
+        <!-- Головна кнопка -->
+        <button
+            class="main-button"
+            id="teaButton"
+            type="button"
+        >
+            Випито чаю за день: 
+            <span id="teaCount">0</span>
+        </button>
+
+
+        <!-- Сніг -->
+        <div
+            class="snow"
+            id="snow"
+        ></div>
+
+
+        <!-- Дождь -->
+        <div
+            class="rain"
+            id="rain"
+        ></div>
+
+
+        <!-- Нижний туман -->
+        <div class="fog-bottom"></div>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
