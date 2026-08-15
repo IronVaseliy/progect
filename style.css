@@ -575,5 +575,7 @@ body.dark .background {
     .theme-button {
         padding: 8px 12px;
     }
-
+body {
+    background: red !important;
+}
 }
