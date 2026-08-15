@@ -11,6 +11,15 @@ const teaButton =
 const teaCount =
     document.getElementById("teaCount");
 
+const weatherStatus =
+    document.getElementById("weatherStatus");
+
+const weatherTemperature =
+    document.getElementById("weatherTemperature");
+
+const weatherCity =
+    document.getElementById("weatherCity");
+
 const weatherIcon =
     document.getElementById("weatherIcon");
 
@@ -363,14 +372,7 @@ async function getWeather() {
 
     }
 
-}
-
-
-/* =========================================
-   10. ВИЗНАЧЕННЯ ПОГОДИ
-========================================= */
-
-function updateWeather(
+}function updateWeather(
     code,
     temperature,
     city
@@ -381,25 +383,20 @@ function updateWeather(
     removeRain();
 
 
-    /*
-     * ЯСНО
-     */
+    /* ЯСНО */
 
     if (code === 0) {
 
-        weatherIcon.textContent =
-            "☀️";
+        weatherIcon.textContent = "☀️";
 
+        weatherStatus.textContent = "Ясно";
 
-        weatherText.textContent =
-            `${city}: ${temperature}°C`;
+        weatherText.textContent = "Чисте небо";
 
     }
 
 
-    /*
-     * ХМАРНО
-     */
+    /* ХМАРНО */
 
     else if (
         code === 1 ||
@@ -407,111 +404,105 @@ function updateWeather(
         code === 3
     ) {
 
-        weatherIcon.textContent =
-            "🌤️";
+        weatherIcon.textContent = "🌤️";
 
+        weatherStatus.textContent = "Хмарно";
 
-        weatherText.textContent =
-            `${city}: ${temperature}°C`;
+        weatherText.textContent = "Мінлива хмарність";
 
     }
 
 
-    /*
-     * ТУМАН
-     */
+    /* ТУМАН */
 
     else if (
         code === 45 ||
         code === 48
     ) {
 
-        weatherIcon.textContent =
-            "🌫️";
+        weatherIcon.textContent = "🌫️";
 
+        weatherStatus.textContent = "Туман";
 
-        weatherText.textContent =
-            `${city}: ${temperature}°C`;
+        weatherText.textContent = "Видимість знижена";
 
     }
 
 
-    /*
-     * ДОЩ
-     */
+    /* ДОЩ */
 
     else if (
         code >= 51 &&
         code <= 67
     ) {
 
-        weatherIcon.textContent =
-            "🌧️";
+        weatherIcon.textContent = "🌧️";
 
+        weatherStatus.textContent = "Дощ";
 
-        weatherText.textContent =
-            `${city}: ${temperature}°C`;
-
+        weatherText.textContent = "Опади";
 
         createRain();
 
     }
 
 
-    /*
-     * СНІГ
-     */
+    /* СНІГ */
 
     else if (
         code >= 71 &&
         code <= 86
     ) {
 
-        weatherIcon.textContent =
-            "❄️";
+        weatherIcon.textContent = "❄️";
 
+        weatherStatus.textContent = "Сніг";
 
-        weatherText.textContent =
-            `${city}: ${temperature}°C`;
-
+        weatherText.textContent = "Снігопад";
 
         createSnow();
 
     }
 
 
-    /*
-     * ГРОЗА
-     */
+    /* ГРОЗА */
 
     else if (code >= 95) {
 
-        weatherIcon.textContent =
-            "⛈️";
+        weatherIcon.textContent = "⛈️";
 
+        weatherStatus.textContent = "Гроза";
 
-        weatherText.textContent =
-            `${city}: ${temperature}°C`;
+        weatherText.textContent = "Гроза";
 
     }
 
 
-    /*
-     * ІНШЕ
-     */
+    /* ІНШЕ */
 
     else {
 
-        weatherIcon.textContent =
-            "🌤️";
+        weatherIcon.textContent = "🌤️";
 
+        weatherStatus.textContent = "Погода";
 
-        weatherText.textContent =
-            `${city}: ${temperature}°C`;
+        weatherText.textContent = "Невідомо";
 
     }
 
+
+    /* Температура */
+
+    weatherTemperature.textContent =
+        Math.round(temperature);
+
+
+    /* Місто */
+
+    weatherCity.textContent =
+        city;
 }
+
 
 
 /* =========================================

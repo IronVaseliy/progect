@@ -50,23 +50,62 @@
 
 
         <!-- Погода -->
-        <section class="weather">
+        <section class="weather-card">
 
-            <span
-                class="weather-icon"
-                id="weatherIcon"
-            >
-                🌤️
+    <div class="weather-top">
+
+        <span class="weather-title">
+            Погода зараз
+        </span>
+
+        <span class="weather-status" id="weatherStatus">
+            ...
+        </span>
+
+    </div>
+
+
+    <div class="weather-main">
+
+        <div
+            class="weather-icon"
+            id="weatherIcon"
+        >
+            🌤️
+        </div>
+
+        <div class="weather-temperature">
+
+            <span id="weatherTemperature">
+                --°
             </span>
 
-            <span
-                class="weather-text"
-                id="weatherText"
-            >
-                Завантаження погоди...
-            </span>
+            <small>°C</small>
 
-        </section>
+        </div>
+
+    </div>
+
+
+    <div class="weather-bottom">
+
+        <span
+            class="weather-city"
+            id="weatherCity"
+        >
+            Завантаження...
+        </span>
+
+        <span
+            class="weather-description"
+            id="weatherText"
+        >
+            Отримання погоди
+        </span>
+
+    </div>
+
+</section>
          <!-- Чашка чаю -->
         <div class="tea-cup">
             ☕
