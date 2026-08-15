@@ -14,10 +14,10 @@
 
     <main class="container">
 
-        <!-- Фонові зображеня -->
+        <!-- Фонове зображення -->
         <img
             class="background"
-            src="mountains.jpg"
+            src="123.png"
             alt=""
         >
 
@@ -25,7 +25,7 @@
         <div class="fog-top"></div>
 
 
-        <!-- Верхняя часть -->
+        <!-- Заголовок -->
         <header class="header">
 
             <h1>
@@ -39,7 +39,7 @@
         </header>
 
 
-        <!-- Перемикатель теми -->
+        <!-- Кнопка перемикання теми -->
         <button
             class="theme-button"
             id="themeButton"
@@ -67,6 +67,44 @@
             </span>
 
         </section>
+         <!-- Чашка чаю -->
+        <div class="tea-cup">
+            ☕
+        </div>
+
+
+        <!-- Об'єм чашки -->
+        <div class="cup-volume">
+
+            <label for="cupVolume">
+                Об'єм чашки:
+            </label>
+
+            <div class="volume-input">
+
+                <input
+                    type="number"
+                    id="cupVolume"
+                    min="1"
+                    step="1"
+                    value="250"
+                >
+
+                <select id="volumeUnit">
+
+                    <option value="ml">
+                        мл
+                    </option>
+
+                    <option value="l">
+                        л
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
 
 
         <!-- Головна кнопка -->
@@ -75,8 +113,13 @@
             id="teaButton"
             type="button"
         >
-            Випито чаю за день: 
-            <span id="teaCount">0</span>
+
+            Випито чаю за день:
+
+            <span id="teaCount">
+                0 мл
+            </span>
+
         </button>
 
 
@@ -87,21 +130,27 @@
         ></div>
 
 
-        <!-- Дождь -->
+        <!-- Дощ -->
         <div
             class="rain"
             id="rain"
         ></div>
 
 
-        <!-- Нижний туман -->
+        <!-- Нижній туман -->
         <div class="fog-bottom"></div>
 
+        
+       
+
     </main>
+    
 
 
     <script src="script.js"></script>
 
+    
+       
 </body>
 
 </html>

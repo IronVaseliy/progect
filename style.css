@@ -1,7 +1,6 @@
-
-/* 
+/* =========================================
    1. БАЗОВІ НАЛАШТУВАННЯ
- */
+========================================= */
 
 * {
     margin: 0;
@@ -17,6 +16,7 @@ body {
     min-height: 100vh;
 
     font-family: Arial, sans-serif;
+
     color: var(--text-color);
 
     background: var(--background);
@@ -29,42 +29,44 @@ body {
 }
 
 
-/* 
-   2. ЗМІННІ — СВІТЛА ТЕМА
- */
+/* =========================================
+   2. CSS ЗМІННІ — СВІТЛА ТЕМА
+========================================= */
 
 :root {
-    /* Основні кольори */
+
     --background: #b9e8ed;
+
     --text-color: #111;
 
-    /* Кнопки */
     --button-bg: rgba(155, 216, 213, 0.75);
+
     --button-text: #111;
+
     --button-border: rgba(255, 255, 255, 0.35);
 
-    /* Тіні */
     --shadow-color: rgba(0, 0, 0, 0.25);
 
-    /* Туман */
     --fog-color: rgba(255, 255, 255, 0.6);
 
-    /* Плавність */
     --transition: 0.4s ease;
 }
 
 
-/* 
+/* =========================================
    3. ТЕМНА ТЕМА
-   JS зможе додати клас .dark до body
- */
+========================================= */
 
 body.dark {
+
     --background: #101820;
+
     --text-color: #ffffff;
 
     --button-bg: rgba(38, 61, 74, 0.85);
+
     --button-text: #ffffff;
+
     --button-border: rgba(255, 255, 255, 0.15);
 
     --shadow-color: rgba(0, 0, 0, 0.6);
@@ -73,15 +75,18 @@ body.dark {
 }
 
 
-/* 
+/* =========================================
    4. ОСНОВНИЙ КОНТЕЙНЕР
- */
+========================================= */
 
 .container {
+
     position: relative;
 
     width: 92%;
+
     max-width: 1200px;
+
     min-height: 90vh;
 
     margin: 30px auto;
@@ -89,24 +94,28 @@ body.dark {
     overflow: hidden;
 
     border: 2px solid rgba(50, 150, 220, 0.7);
+
     border-radius: 4px;
 
     background: var(--background);
 
-    transition: background var(--transition);
+    transition:
+        background var(--transition);
 }
 
 
-/* 
-   5. ФОНОВЕ ЗОБРАЖЕННЯ
- */
+/* =========================================
+   5. ФОН
+========================================= */
 
 .background {
+
     position: absolute;
 
     inset: 0;
 
     width: 100%;
+
     height: 100%;
 
     object-fit: cover;
@@ -119,14 +128,15 @@ body.dark {
 }
 
 
-/* 
+/* =========================================
    6. ЗАГОЛОВОК
- */
+========================================= */
 
 .header {
+
     position: relative;
 
-    z-index: 5;
+    z-index: 15;
 
     text-align: center;
 
@@ -134,7 +144,9 @@ body.dark {
 }
 
 .header h1 {
+
     font-size: clamp(30px, 5vw, 58px);
+
     font-weight: 400;
 
     transition:
@@ -143,23 +155,222 @@ body.dark {
 }
 
 .header p {
+
     margin-top: 5px;
 
     font-size: clamp(16px, 2vw, 20px);
 
-    transition: color var(--transition);
+    transition:
+        color var(--transition);
 }
 
 
-/* 
-   7. ГОЛОВНА КНОПКА
- */
+/* =========================================
+   7. КНОПКА ДЕНЬ / НІЧ
+========================================= */
 
-.main-button {
+.theme-button {
+
+    position: absolute;
+
+    top: 20px;
+
+    left: 20px;
+
+    z-index: 30;
+
+    padding: 10px 15px;
+
+    border: 1px solid var(--button-border);
+
+    border-radius: 50px;
+
+    background: var(--button-bg);
+
+    color: var(--button-text);
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 12px var(--shadow-color);
+
+    transition:
+        background 0.4s ease,
+        color 0.4s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.theme-button:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 7px 18px var(--shadow-color);
+}
+
+.theme-button:active {
+
+    transform: translateY(0);
+}
+
+
+/* =========================================
+   8. ПОГОДА
+========================================= */
+
+.weather {
+
+    position: relative;
+
+    z-index: 15;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 10px;
+
+    color: var(--text-color);
+}
+
+.weather-icon {
+
+    width: 40px;
+
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 28px;
+}
+
+.weather-text {
+
+    font-size: 18px;
+
+    color: var(--text-color);
+
+    transition:
+        color var(--transition);
+}
+
+
+/* =========================================
+   9. ОБ'ЄМ ЧАШКИ
+========================================= */
+
+.cup-volume {
+
     position: absolute;
 
     left: 50%;
-    top: 50%;
+
+    top: 38%;
+
+    transform: translateX(-50%);
+
+    z-index: 20;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: var(--text-color);
+}
+
+.cup-volume label {
+
+    font-size: 18px;
+
+    font-weight: 500;
+}
+
+.volume-input {
+
+    display: flex;
+
+    gap: 6px;
+}
+
+.volume-input input,
+.volume-input select {
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--button-border);
+
+    border-radius: 8px;
+
+    background: var(--button-bg);
+
+    color: var(--button-text);
+
+    font-size: 16px;
+
+    font-family: inherit;
+
+    outline: none;
+
+    transition:
+        box-shadow 0.25s ease,
+        transform 0.25s ease,
+        background 0.3s ease,
+        color 0.3s ease;
+}
+
+.volume-input input {
+
+    width: 120px;
+}
+
+.volume-input select {
+
+    width: 70px;
+
+    cursor: pointer;
+}
+
+.volume-input input:hover,
+.volume-input select:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 15px var(--shadow-color);
+}
+
+.volume-input input:focus,
+.volume-input select:focus {
+
+    box-shadow:
+        0 0 0 3px rgba(50, 150, 220, 0.25);
+}
+
+
+/* =========================================
+   10. ГОЛОВНА КНОПКА
+========================================= */
+
+.main-button {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 52%;
 
     transform: translate(-50%, -50%);
 
@@ -168,12 +379,15 @@ body.dark {
     padding: 20px 35px;
 
     border: 1px solid var(--button-border);
+
     border-radius: 12px;
 
     background: var(--button-bg);
+
     color: var(--button-text);
 
     font-size: 20px;
+
     font-family: inherit;
 
     cursor: pointer;
@@ -187,92 +401,32 @@ body.dark {
         color 0.4s ease;
 }
 
-
-/* Наведення */
-
 .main-button:hover {
-    transform: translate(-50%, calc(-50% - 5px));
+
+    transform:
+        translate(-50%, calc(-50% - 5px));
 
     box-shadow:
         0 10px 30px var(--shadow-color);
 }
 
-
-/* Натискання */
-
 .main-button:active {
-    transform: translate(-50%, -50%);
+
+    transform:
+        translate(-50%, -50%);
 
     box-shadow:
         0 4px 10px var(--shadow-color);
 }
 
 
-/* 
-   8. ЗВИЧАЙНІ КНОПКИ
-   Для майбутніх кнопок JS / HTML
- */
-
-button {
-    font-family: inherit;
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.3s ease;
-}
-
-button:hover {
-    cursor: pointer;
-}
-
-
-/* 
-   9. КНОПКА ДЕНЬ / НІЧ
- */
-
-.theme-button {
-    position: relative;
-
-    z-index: 30;
-
-    padding: 10px 15px;
-
-    border: 1px solid var(--button-border);
-    border-radius: 50px;
-
-    background: var(--button-bg);
-    color: var(--button-text);
-
-    cursor: pointer;
-
-    box-shadow: 0 4px 12px var(--shadow-color);
-
-    transition:
-        background 0.4s ease,
-        color 0.4s ease,
-        transform 0.25s ease,
-        box-shadow 0.25s ease;
-}
-
-.theme-button:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 7px 18px var(--shadow-color);
-}
-
-.theme-button:active {
-    transform: translateY(0);
-}
-
-
-/* 
-   10. ТУМАН
- */
+/* =========================================
+   11. ТУМАН
+========================================= */
 
 .fog-top,
 .fog-bottom {
+
     position: absolute;
 
     left: 0;
@@ -288,97 +442,52 @@ button:hover {
         background 0.8s ease;
 }
 
-
-/* Верхній туман */
-
 .fog-top {
+
     top: 0;
 
     height: 120px;
 
-    background: linear-gradient(
-        to bottom,
-        var(--fog-color),
-        transparent
-    );
+    background:
+        linear-gradient(
+            to bottom,
+            var(--fog-color),
+            transparent
+        );
 }
 
-
-/* Нижній туман */
-
 .fog-bottom {
+
     bottom: 0;
 
     height: 120px;
 
-    background: linear-gradient(
-        to top,
-        var(--fog-color),
-        transparent
-    );
+    background:
+        linear-gradient(
+            to top,
+            var(--fog-color),
+            transparent
+        );
 }
 
 
-/* 
-   11. СТАН ТУМАНУ
-   JS зможе додати .fog-hidden
- */
+/* =========================================
+   12. ПЕРЕМИКАННЯ ТУМАНУ
+========================================= */
 
 body.fog-hidden .fog-top,
 body.fog-hidden .fog-bottom {
+
     opacity: 0;
 }
 
 
-/* 
-   12. ПОГОДА
- */
-
-.weather {
-    position: relative;
-
-    z-index: 15;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 10px;
-
-    padding: 10px;
-}
-
-.weather-icon {
-    width: 40px;
-    height: 40px;
-
-    object-fit: contain;
-}
-
-.weather-text {
-    font-size: 18px;
-
-    color: var(--text-color);
-
-    transition: color var(--transition);
-}
-
-
-/* 
+/* =========================================
    13. СНІГ
-= */
-
-/*
-   JS зможе додати клас:
-
-   body.snow
-
-   А самі сніжинки можна буде створювати
-   через JavaScript.
-*/
+========================================= */
 
 .snow {
+
     position: absolute;
 
     inset: 0;
@@ -390,10 +499,8 @@ body.fog-hidden .fog-bottom {
     overflow: hidden;
 }
 
-
-/* Окрема сніжинка */
-
 .snowflake {
+
     position: absolute;
 
     top: -20px;
@@ -408,27 +515,28 @@ body.fog-hidden .fog-bottom {
         snowfall linear infinite;
 }
 
-
-/* Анімація снігу */
-
 @keyframes snowfall {
 
     from {
-        transform: translateY(-20px);
+
+        transform:
+            translateY(-20px);
     }
 
     to {
-        transform: translateY(110vh);
-    }
 
+        transform:
+            translateY(110vh);
+    }
 }
 
 
-/* 
+/* =========================================
    14. ДОЩ
- */
+========================================= */
 
 .rain {
+
     position: absolute;
 
     inset: 0;
@@ -441,141 +549,242 @@ body.fog-hidden .fog-bottom {
 }
 
 .raindrop {
+
     position: absolute;
 
     top: -30px;
 
     width: 2px;
+
     height: 20px;
 
-    background: rgba(255, 255, 255, 0.6);
+    background:
+        rgba(255, 255, 255, 0.6);
 
     animation:
         rain-fall linear infinite;
 }
 
-
 @keyframes rain-fall {
 
     from {
-        transform: translateY(-30px);
+
+        transform:
+            translateY(-30px);
     }
 
     to {
-        transform: translateY(110vh);
-    }
 
+        transform:
+            translateY(110vh);
+    }
 }
 
 
-/* 
+/* =========================================
    15. АНІМАЦІЯ ПОЯВИ
- */
+========================================= */
 
 .fade-in {
-    animation: fadeIn 0.8s ease forwards;
+
+    animation:
+        fadeIn 0.8s ease forwards;
 }
 
 @keyframes fadeIn {
 
     from {
+
         opacity: 0;
-        transform: translateY(15px);
+
+        transform:
+            translateY(15px);
     }
 
     to {
+
         opacity: 1;
-        transform: translateY(0);
+
+        transform:
+            translateY(0);
     }
-
 }
 
 
-/* 
-   16. ПЛАВНИЙ ПЕРЕХІД
- */
-
-.theme-transition {
-    transition:
-        background 0.8s ease,
-        color 0.8s ease,
-        filter 0.8s ease;
-}
-
-
-/* 
-   17. СТАН НІЧ
- */
+/* =========================================
+   16. НІЧНИЙ ФОН
+========================================= */
 
 body.dark .background {
-    filter: brightness(0.55);
+
+    filter:
+        brightness(0.55);
 }
 
 
-/* 
-   18. АДАПТАЦІЯ ПІД ТЕЛЕФОН
- */
+/* =========================================
+   17. ЗВИЧАЙНІ КНОПКИ
+========================================= */
+
+button {
+
+    font-family: inherit;
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.3s ease;
+}
+
+button:hover {
+
+    cursor: pointer;
+}
+
+
+/* =========================================
+   18. АДАПТАЦІЯ ПІД ПЛАНШЕТ
+========================================= */
 
 @media (max-width: 768px) {
 
     .container {
+
         width: 96%;
+
         min-height: 92vh;
 
         margin: 15px auto;
     }
 
     .header {
-        padding: 12px 10px;
+
+        padding:
+            12px 10px;
     }
 
     .header h1 {
-        font-size: clamp(26px, 8vw, 42px);
+
+        font-size:
+            clamp(26px, 8vw, 42px);
     }
 
     .header p {
+
         font-size: 16px;
     }
 
     .main-button {
+
         width: auto;
+
         max-width: 85%;
 
-        padding: 16px 25px;
+        padding:
+            16px 25px;
 
         font-size: 17px;
     }
 
-    .fog-top,
-    .fog-bottom {
-        height: 90px;
+    .cup-volume {
+
+        top: 40%;
     }
 
+    .fog-top,
+    .fog-bottom {
+
+        height: 90px;
+    }
 }
 
 
-/* 
-   19. ДУЖЕ МАЛЕНЬКИЙ ЕКРАН
-*/
+/* =========================================
+   19. АДАПТАЦІЯ ПІД ТЕЛЕФОН
+========================================= */
 
 @media (max-width: 480px) {
 
     .container {
+
         min-height: 95vh;
 
         margin: 10px auto;
     }
 
     .main-button {
-        padding: 14px 20px;
+
+        padding:
+            14px 20px;
 
         font-size: 16px;
     }
 
     .theme-button {
-        padding: 8px 12px;
+
+        top: 15px;
+
+        left: 15px;
+
+        padding:
+            8px 12px;
     }
-body {
-    background: red !important;
+
+    .cup-volume {
+
+        top: 40%;
+    }
+
+    .cup-volume label {
+
+        font-size: 16px;
+    }
+
+    .volume-input input {
+
+        width: 110px;
+    }
+
+    .volume-input input,
+    .volume-input select {
+
+        padding:
+            8px 10px;
+
+        font-size: 15px;
+    }
+
+    .weather-text {
+
+        font-size: 15px;
+    }
+    /* Чашка чаю */
+.tea-cup {
+    font-size: 120px;
+    text-align: center;
+    margin: 20px 0;
+
+    filter: drop-shadow(
+        0 10px 10px rgba(0, 0, 0, 0.3)
+    );
+
+    animation: cupFloat 3s ease-in-out infinite;
+}
+
+/* Лёгкое покачивание чашки */
+@keyframes cupFloat {
+
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+
 }
 }
