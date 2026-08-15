@@ -758,33 +758,83 @@ button:hover {
 
         font-size: 15px;
     }
-    /* Чашка чаю */
+   
+
+
+
+    
+}
+/* =========================================
+   20. ЧАШКА ЧАЮ
+========================================= */
+
 .tea-cup {
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 45px;
+
+    transform: translateX(-50%);
+
+    z-index: 18;
+
     font-size: 120px;
-    text-align: center;
-    margin: 20px 0;
 
-    filter: drop-shadow(
-        0 10px 10px rgba(0, 0, 0, 0.3)
-    );
+    line-height: 1;
 
-    animation: cupFloat 3s ease-in-out infinite;
+    filter:
+        drop-shadow(
+            0 10px 10px rgba(0, 0, 0, 0.3)
+        );
+
+    animation:
+        cupFloat 3s ease-in-out infinite;
+
+    transition:
+        transform 0.3s ease,
+        filter 0.3s ease;
 }
 
-/* Лёгкое покачивание чашки */
+
+/* Плавне плавання чашки */
+
 @keyframes cupFloat {
 
     0% {
-        transform: translateY(0);
+
+        transform:
+            translateX(-50%)
+            translateY(0);
     }
 
     50% {
-        transform: translateY(-8px);
+
+        transform:
+            translateX(-50%)
+            translateY(-8px);
     }
 
     100% {
-        transform: translateY(0);
-    }
 
+        transform:
+            translateX(-50%)
+            translateY(0);
+    }
 }
+
+
+/* =========================================
+   ЧАШКА НА ТЕЛЕФОНІ
+========================================= */
+
+@media (max-width: 480px) {
+
+    .tea-cup {
+
+        font-size: 90px;
+
+        bottom: 35px;
+    }
 }
