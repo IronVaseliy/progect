@@ -39,7 +39,7 @@
         </header>
 
 
-        <!-- Кнопка перемикання теми -->
+        <!-- Кнопка день / ніч -->
         <button
             class="theme-button"
             id="themeButton"
@@ -52,64 +52,63 @@
         <!-- Погода -->
         <section class="weather-card">
 
-    <div class="weather-top">
+            <div class="weather-top">
 
-        <span class="weather-title">
-            Погода зараз
-        </span>
+                <span class="weather-title">
+                    Погода зараз
+                </span>
 
-        <span class="weather-status" id="weatherStatus">
-            ...
-        </span>
+                <span
+                    class="weather-status"
+                    id="weatherStatus"
+                >
+                    ...
+                </span>
 
-    </div>
-
-
-    <div class="weather-main">
-
-        <div
-            class="weather-icon"
-            id="weatherIcon"
-        >
-            🌤️
-        </div>
-
-        <div class="weather-temperature">
-
-            <span id="weatherTemperature">
-                --°
-            </span>
-
-            <small>°C</small>
-
-        </div>
-
-    </div>
+            </div>
 
 
-    <div class="weather-bottom">
+            <div class="weather-main">
 
-        <span
-            class="weather-city"
-            id="weatherCity"
-        >
-            Завантаження...
-        </span>
+                <div
+                    class="weather-icon"
+                    id="weatherIcon"
+                >
+                    🌤️
+                </div>
 
-        <span
-            class="weather-description"
-            id="weatherText"
-        >
-            Отримання погоди
-        </span>
+                <div class="weather-temperature">
 
-    </div>
+                    <span id="weatherTemperature">
+                        --
+                    </span>
 
-</section>
-         <!-- Чашка чаю -->
-        <div class="tea-cup">
-            ☕
-        </div>
+                    <small>°C</small>
+
+                </div>
+
+            </div>
+
+
+            <div class="weather-bottom">
+
+                <span
+                    class="weather-city"
+                    id="weatherCity"
+                >
+                    Завантаження...
+                </span>
+
+                <span
+                    class="weather-description"
+                    id="weatherText"
+                >
+                    Отримання погоди
+                </span>
+
+            </div>
+
+        </section>
 
 
         <!-- Об'єм чашки -->
@@ -162,6 +161,89 @@
         </button>
 
 
+        <!-- Чашка -->
+        <div class="tea-cup">
+            ☕
+        </div>
+
+
+        <!-- Статистика -->
+        <section class="statistics">
+
+            <h2>
+                Статистика чаю
+            </h2>
+
+
+            <div class="statistics-grid">
+
+                <!-- Місяць -->
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📅
+                    </div>
+
+                    <div class="stat-title">
+                        За місяць
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="monthStat"
+                    >
+                        0 мл
+                    </div>
+
+                </div>
+
+
+                <!-- 6 місяців -->
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📊
+                    </div>
+
+                    <div class="stat-title">
+                        За 6 місяців
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="sixMonthsStat"
+                    >
+                        0 мл
+                    </div>
+
+                </div>
+
+
+                <!-- Рік -->
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📈
+                    </div>
+
+                    <div class="stat-title">
+                        За рік
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="yearStat"
+                    >
+                        0 мл
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
         <!-- Сніг -->
         <div
             class="snow"
@@ -179,17 +261,11 @@
         <!-- Нижній туман -->
         <div class="fog-bottom"></div>
 
-        
-       
-
     </main>
-    
 
 
     <script src="script.js"></script>
 
-    
-       
 </body>
 
 </html>

@@ -11,6 +11,12 @@ const teaButton =
 const teaCount =
     document.getElementById("teaCount");
 
+const weatherIcon =
+    document.getElementById("weatherIcon");
+
+const weatherText =
+    document.getElementById("weatherText");
+
 const weatherStatus =
     document.getElementById("weatherStatus");
 
@@ -19,12 +25,6 @@ const weatherTemperature =
 
 const weatherCity =
     document.getElementById("weatherCity");
-
-const weatherIcon =
-    document.getElementById("weatherIcon");
-
-const weatherText =
-    document.getElementById("weatherText");
 
 const snowContainer =
     document.getElementById("snow");
@@ -37,6 +37,18 @@ const cupVolume =
 
 const volumeUnit =
     document.getElementById("volumeUnit");
+
+
+/* Статистика */
+
+const monthStat =
+    document.getElementById("monthStat");
+
+const sixMonthsStat =
+    document.getElementById("sixMonthsStat");
+
+const yearStat =
+    document.getElementById("yearStat");
 
 
 /* =========================================
@@ -64,7 +76,7 @@ themeButton.addEventListener("click", () => {
 
 
 /* =========================================
-   2. ФОРМАТУВАННЯ ОБ'ЄМУ
+   2. ФОРМАТ ОБ'ЄМУ
 ========================================= */
 
 function formatVolume(ml) {
@@ -75,26 +87,119 @@ function formatVolume(ml) {
 
     }
 
-    return `${ml} мл`;
+    return `${Math.round(ml)} мл`;
+}
+/* =========================================
+   ДАТА
+========================================= */
+
+function getDateKey(date = new Date()) {
+
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
 }
 
 
 /* =========================================
-   3. ЗАВАНТАЖЕННЯ ЛІЧИЛЬНИКА
+   СЧЁТЧИК ЗА СЬОГОДНІ
 ========================================= */
 
-let tea =
-    Number(
-        localStorage.getItem("teaCount")
-    ) || 0;
+const today = getDateKey();
+
+const savedTeaDate =
+    localStorage.getItem("teaCountDate");
+
+let tea = 0;
+
+
+if (savedTeaDate === today) {
+
+    tea =
+        Number(
+            localStorage.getItem("teaCount")
+        ) || 0;
+
+} else {
+
+    tea = 0;
+
+    localStorage.setItem(
+        "teaCount",
+        "0"
+    );
+
+    localStorage.setItem(
+        "teaCountDate",
+        today
+    );
+}
 
 
 teaCount.textContent =
     formatVolume(tea);
+/* =========================================
+   4. ІСТОРІЯ ВИПИТОГО ЧАЮ
+========================================= */
+
+/*
+    Тут зберігаємо приблизно так:
+
+    [
+        {
+            date: "2026-08-20",
+            volume: 250
+        },
+
+        {
+            date: "2026-08-20",
+            volume: 300
+        }
+    ]
+*/
+
+let teaHistory =
+    JSON.parse(
+        localStorage.getItem("teaHistory")
+    ) || [];
 
 
 /* =========================================
-   4. ДОДАВАННЯ ЧАЮ
+   5. ОТРИМАННЯ ДАТИ
+========================================= */
+
+function getDateKey(date = new Date()) {
+
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+}
+
+
+/* =========================================
+   6. ДОДАВАННЯ ЧАЮ
 ========================================= */
 
 teaButton.addEventListener("click", () => {
@@ -118,7 +223,7 @@ teaButton.addEventListener("click", () => {
     }
 
 
-    /* Літри переводимо в мілілітри */
+    /* Літри → мілілітри */
 
     if (unit === "l") {
 
@@ -127,29 +232,168 @@ teaButton.addEventListener("click", () => {
     }
 
 
-    /* Додаємо до загальної кількості */
+    /* Загальна кількість */
 
     tea += volume;
 
 
-    /* Оновлюємо текст */
-
     teaCount.textContent =
         formatVolume(tea);
 
-
-    /* Зберігаємо */
 
     localStorage.setItem(
         "teaCount",
         tea
     );
 
+
+    /* Додаємо запис у історію */
+
+    teaHistory.push({
+
+        date:
+            getDateKey(),
+
+        volume:
+            volume
+
+    });
+
+
+    localStorage.setItem(
+        "teaHistory",
+        JSON.stringify(teaHistory)
+    );
+
+
+    /* Оновлюємо статистику */
+
+    updateStatistics();
+
 });
 
 
 /* =========================================
-   5. СТВОРЕННЯ СНІГУ
+   7. ПОЧАТОК ПОТОЧНОГО МІСЯЦЯ
+========================================= */
+
+function getStartOfMonth() {
+
+    const now =
+        new Date();
+
+    return new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1
+    );
+}
+
+
+/* =========================================
+   8. ПОЧАТОК 6 МІСЯЦІВ
+========================================= */
+
+function getStartOfSixMonths() {
+
+    const now =
+        new Date();
+
+    return new Date(
+        now.getFullYear(),
+        now.getMonth() - 5,
+        1
+    );
+}
+
+
+/* =========================================
+   9. ПОЧАТОК РОКУ
+========================================= */
+
+function getStartOfYear() {
+
+    const now =
+        new Date();
+
+    return new Date(
+        now.getFullYear(),
+        0,
+        1
+    );
+}
+
+
+/* =========================================
+   10. ПІДРАХУНОК СТАТИСТИКИ
+========================================= */
+
+function calculatePeriod(startDate) {
+
+    let total = 0;
+
+
+    teaHistory.forEach(item => {
+
+        const itemDate =
+            new Date(
+                item.date + "T00:00:00"
+            );
+
+
+        if (itemDate >= startDate) {
+
+            total +=
+                Number(item.volume) || 0;
+
+        }
+
+    });
+
+
+    return total;
+}
+
+
+/* =========================================
+   11. ОНОВЛЕННЯ СТАТИСТИКИ
+========================================= */
+
+function updateStatistics() {
+
+    const month =
+        calculatePeriod(
+            getStartOfMonth()
+        );
+
+
+    const sixMonths =
+        calculatePeriod(
+            getStartOfSixMonths()
+        );
+
+
+    const year =
+        calculatePeriod(
+            getStartOfYear()
+        );
+
+
+    monthStat.textContent =
+        formatVolume(month);
+
+
+    sixMonthsStat.textContent =
+        formatVolume(sixMonths);
+
+
+    yearStat.textContent =
+        formatVolume(year);
+}
+
+
+/* =========================================
+   12. СТВОРЕННЯ СНІГУ
 ========================================= */
 
 function createSnow() {
@@ -204,7 +448,7 @@ function createSnow() {
 
 
 /* =========================================
-   6. ВИДАЛЕННЯ СНІГУ
+   13. ВИДАЛЕННЯ СНІГУ
 ========================================= */
 
 function removeSnow() {
@@ -215,7 +459,7 @@ function removeSnow() {
 
 
 /* =========================================
-   7. СТВОРЕННЯ ДОЩУ
+   14. СТВОРЕННЯ ДОЩУ
 ========================================= */
 
 function createRain() {
@@ -262,7 +506,7 @@ function createRain() {
 
 
 /* =========================================
-   8. ВИДАЛЕННЯ ДОЩУ
+   15. ВИДАЛЕННЯ ДОЩУ
 ========================================= */
 
 function removeRain() {
@@ -273,17 +517,12 @@ function removeRain() {
 
 
 /* =========================================
-   9. ОТРИМАННЯ ПОГОДИ
+   16. ОТРИМАННЯ ПОГОДИ
 ========================================= */
 
 async function getWeather() {
 
     try {
-
-        /*
-         * Визначаємо приблизне
-         * місцезнаходження по IP
-         */
 
         const locationResponse =
             await fetch(
@@ -313,10 +552,6 @@ async function getWeather() {
             location.city || "Ваше місто";
 
 
-        /*
-         * Отримуємо погоду
-         */
-
         const weatherResponse =
             await fetch(
                 `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code`
@@ -343,10 +578,6 @@ async function getWeather() {
             weather.current.weather_code;
 
 
-        /*
-         * Оновлюємо погоду
-         */
-
         updateWeather(
             weatherCode,
             temperature,
@@ -367,12 +598,31 @@ async function getWeather() {
             "🌤️";
 
 
+        weatherStatus.textContent =
+            "Помилка";
+
+
+        weatherTemperature.textContent =
+            "--";
+
+
+        weatherCity.textContent =
+            "Невідомо";
+
+
         weatherText.textContent =
-            "Не вдалося отримати погоду";
+            "Погода недоступна";
 
     }
 
-}function updateWeather(
+}
+
+
+/* =========================================
+   17. ВИЗНАЧЕННЯ ПОГОДИ
+========================================= */
+
+function updateWeather(
     code,
     temperature,
     city
@@ -387,12 +637,14 @@ async function getWeather() {
 
     if (code === 0) {
 
-        weatherIcon.textContent = "☀️";
+        weatherIcon.textContent =
+            "☀️";
 
-        weatherStatus.textContent = "Ясно";
+        weatherStatus.textContent =
+            "Ясно";
 
-        weatherText.textContent = "Чисте небо";
-
+        weatherText.textContent =
+            "Чисте небо";
     }
 
 
@@ -404,12 +656,14 @@ async function getWeather() {
         code === 3
     ) {
 
-        weatherIcon.textContent = "🌤️";
+        weatherIcon.textContent =
+            "🌤️";
 
-        weatherStatus.textContent = "Хмарно";
+        weatherStatus.textContent =
+            "Хмарно";
 
-        weatherText.textContent = "Мінлива хмарність";
-
+        weatherText.textContent =
+            "Мінлива хмарність";
     }
 
 
@@ -420,12 +674,14 @@ async function getWeather() {
         code === 48
     ) {
 
-        weatherIcon.textContent = "🌫️";
+        weatherIcon.textContent =
+            "🌫️";
 
-        weatherStatus.textContent = "Туман";
+        weatherStatus.textContent =
+            "Туман";
 
-        weatherText.textContent = "Видимість знижена";
-
+        weatherText.textContent =
+            "Видимість знижена";
     }
 
 
@@ -436,14 +692,16 @@ async function getWeather() {
         code <= 67
     ) {
 
-        weatherIcon.textContent = "🌧️";
+        weatherIcon.textContent =
+            "🌧️";
 
-        weatherStatus.textContent = "Дощ";
+        weatherStatus.textContent =
+            "Дощ";
 
-        weatherText.textContent = "Опади";
+        weatherText.textContent =
+            "Опади";
 
         createRain();
-
     }
 
 
@@ -454,14 +712,16 @@ async function getWeather() {
         code <= 86
     ) {
 
-        weatherIcon.textContent = "❄️";
+        weatherIcon.textContent =
+            "❄️";
 
-        weatherStatus.textContent = "Сніг";
+        weatherStatus.textContent =
+            "Сніг";
 
-        weatherText.textContent = "Снігопад";
+        weatherText.textContent =
+            "Снігопад";
 
         createSnow();
-
     }
 
 
@@ -469,12 +729,14 @@ async function getWeather() {
 
     else if (code >= 95) {
 
-        weatherIcon.textContent = "⛈️";
+        weatherIcon.textContent =
+            "⛈️";
 
-        weatherStatus.textContent = "Гроза";
+        weatherStatus.textContent =
+            "Гроза";
 
-        weatherText.textContent = "Гроза";
-
+        weatherText.textContent =
+            "Гроза";
     }
 
 
@@ -482,12 +744,14 @@ async function getWeather() {
 
     else {
 
-        weatherIcon.textContent = "🌤️";
+        weatherIcon.textContent =
+            "🌤️";
 
-        weatherStatus.textContent = "Погода";
+        weatherStatus.textContent =
+            "Погода";
 
-        weatherText.textContent = "Невідомо";
-
+        weatherText.textContent =
+            "Невідомо";
     }
 
 
@@ -504,9 +768,15 @@ async function getWeather() {
 }
 
 
-
 /* =========================================
-   11. ЗАПУСК ПОГОДИ
+   18. ЗАПУСК
 ========================================= */
+
+/* Статистика при відкритті */
+
+updateStatistics();
+
+
+/* Погода */
 
 getWeather();
