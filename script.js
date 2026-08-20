@@ -179,23 +179,7 @@ let teaHistory =
    5. ОТРИМАННЯ ДАТИ
 ========================================= */
 
-function getDateKey(date = new Date()) {
 
-    const year =
-        date.getFullYear();
-
-    const month =
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0");
-
-    const day =
-        String(
-            date.getDate()
-        ).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-}
 
 
 /* =========================================
@@ -780,3 +764,208 @@ updateStatistics();
 /* Погода */
 
 getWeather();
+/* =========================================
+   ТЕСТ ДОЩУ
+========================================= */
+
+const rainTestButton =
+    document.getElementById("rainTestButton");
+
+let rainTestActive = false;
+
+if (rainTestButton) {
+
+    rainTestButton.addEventListener("click", () => {
+
+        rainTestActive = !rainTestActive;
+
+        if (rainTestActive) {
+
+            createRain();
+
+            rainTestButton.textContent =
+                "☀️ Вимкнути дощ";
+
+        } else {
+
+            removeRain();
+
+            rainTestButton.textContent =
+                "🌧️ Тест дощу";
+
+        }});
+
+    
+
+}
+
+
+/* =========================================
+   ГРАФІК ЗА ОСТАННІ 7 ДНІВ
+========================================= */
+
+function updateTeaChart() {
+
+    const chartArea =
+        document.getElementById("chartArea");
+
+    const chartTotal =
+        document.getElementById("chartTotal");
+
+    if (!chartArea) return;
+
+
+    chartArea.innerHTML = "";
+
+
+    /* Отримуємо історію */
+
+    const history =
+        JSON.parse(
+            localStorage.getItem("teaHistory")
+        ) || [];
+
+
+    /* Останні 7 днів */
+
+    const days = [];
+
+    for (let i = 6; i >= 0; i--) {
+
+        const date = new Date();
+
+        date.setDate(
+            date.getDate() - i
+        );
+
+        days.push({
+
+            key: getDateKey(date),
+
+            date: date,
+
+            volume: 0
+
+        });
+
+    }
+
+
+    /* Знаходимо чай за кожен день */
+
+    history.forEach(item => {
+
+        const day =
+            days.find(
+                d => d.key === item.date
+            );
+
+        if (day) {
+
+            day.volume +=
+                Number(item.volume) || 0;
+
+        }
+
+    });
+
+
+    /* Максимальне значення */
+
+    const maxVolume =
+        Math.max(
+            ...days.map(
+                d => d.volume
+            ),
+            500
+        );
+
+
+    /* Загальна кількість */
+
+    const total =
+        days.reduce(
+            (sum, day) =>
+                sum + day.volume,
+            0
+        );
+
+
+    chartTotal.textContent =
+        formatVolume(total);
+
+
+    /* Створюємо стовпчики */
+
+    days.forEach(day => {
+
+        const column =
+            document.createElement("div");
+
+        column.className =
+            "chart-column";
+
+
+        const bar =
+            document.createElement("div");
+
+        bar.className =
+            "chart-bar";
+
+
+        /* Висота */
+
+        const height =
+            (day.volume / maxVolume) * 100;
+
+        bar.style.height =
+            `${Math.max(height, 2)}%`;
+
+
+        /* Значення */
+
+        const value =
+            document.createElement("span");
+
+        value.className =
+            "chart-value";
+
+        value.textContent =
+            formatVolume(day.volume);
+
+
+        /* День */
+
+        const dayName =
+            document.createElement("span");
+
+        dayName.className =
+            "chart-day";
+
+        dayName.textContent =
+            day.date.toLocaleDateString(
+                "uk-UA",
+                {
+                    weekday: "short"
+                }
+            );
+
+
+        bar.appendChild(value);
+
+        column.appendChild(bar);
+
+        column.appendChild(dayName);
+
+        chartArea.appendChild(column);
+
+    });
+
+}
+
+
+/* =========================================
+   ЗАПУСК ГРАФІКА
+========================================= */
+
+updateTeaChart();

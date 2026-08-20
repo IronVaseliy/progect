@@ -109,7 +109,7 @@
             </div>
 
         </section>
-
+        
 
         <!-- Об'єм чашки -->
         <div class="cup-volume">
@@ -242,6 +242,39 @@
             </div>
 
         </section>
+        <!-- Графік за останні 7 днів -->
+<section class="tea-chart">
+
+    <div class="chart-header">
+        <div>
+            <h2>Випито за останні 7 днів</h2>
+            <p>Статистика споживання чаю</p>
+        </div>
+
+        <span class="chart-total" id="chartTotal">
+            0 мл
+        </span>
+    </div>
+
+    <div class="chart">
+
+        <div class="chart-y">
+            <span>2 л</span>
+            <span>1.5 л</span>
+            <span>1 л</span>
+            <span>500 мл</span>
+            <span>0</span>
+        </div>
+
+        <div class="chart-area" id="chartArea">
+
+            <!-- Сюди JavaScript створить стовпчики -->
+
+        </div>
+
+    </div>
+
+</section>
 
 
         <!-- Сніг -->
@@ -256,6 +289,15 @@
             class="rain"
             id="rain"
         ></div>
+        <!-- Тест дощу -->
+<button
+    class="rain-test-button"
+    id="rainTestButton"
+    type="button"
+>
+    🌧️ Тест дощу
+</button>
+
 
 
         <!-- Нижній туман -->
@@ -267,5 +309,6 @@
     <script src="script.js"></script>
 
 </body>
+
 
 </html>

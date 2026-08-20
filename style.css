@@ -1013,4 +1013,347 @@ body.dark .background {
 
         font-size: 21px;
     }
+    /* =========================================
+   ТЕСТ ДОЩУ
+========================================= */
+
+.rain-test-button {
+    position: absolute;
+
+    left: 50%;
+    top: 550px;
+
+    transform: translateX(-50%);
+
+    z-index: 100;
+
+    padding: 10px 18px;
+
+    border: 1px solid var(--button-border);
+    border-radius: 10px;
+
+    background: var(--button-bg);
+    color: var(--button-text);
+
+    font-size: 15px;
+    font-family: inherit;
+
+    cursor: pointer;
+
+    backdrop-filter: blur(5px);
+
+    box-shadow:
+        0 5px 15px var(--shadow-color);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.3s ease;
+}
+
+.rain-test-button:hover {
+    transform:
+        translateX(-50%)
+        translateY(-3px);
+
+    box-shadow:
+        0 10px 25px var(--shadow-color);
+}
+
+.rain-test-button:active {
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+/* =========================================
+   ГРАФІК ЧАЮ
+========================================= */
+
+.tea-chart {
+    position: relative;
+
+    z-index: 20;
+
+    width: min(90%, 700px);
+
+    margin: 25px auto;
+
+    padding: 22px;
+
+    border-radius: 18px;
+
+    background: rgba(35, 50, 55, 0.82);
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    backdrop-filter: blur(8px);
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.35);
+
+    color: var(--button-text);
+}
+
+
+/* Верх графіка */
+
+.chart-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+.chart-header h2 {
+    margin: 0;
+
+    font-size: 20px;
+}
+
+.chart-header p {
+    margin-top: 5px;
+
+    font-size: 13px;
+
+    opacity: 0.65;
+}
+
+.chart-total {
+    padding: 8px 12px;
+
+    border-radius: 10px;
+
+    background: var(--button-bg);
+
+    font-weight: bold;
+}
+
+
+/* Область графіка */
+
+.chart {
+    display: flex;
+
+    height: 230px;
+
+    width: 100%;
+}
+
+
+/* Значення зліва */
+
+.chart-y {
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    width: 45px;
+
+    padding-bottom: 25px;
+
+    font-size: 11px;
+
+    opacity: 0.6;
+
+    text-align: right;
+}
+
+
+/* Сам графік */
+
+.chart-area {
+    position: relative;
+
+    flex: 1;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-around;
+
+    gap: 12px;
+
+    padding:
+        0 10px 25px 15px;
+
+    border-bottom: 1px solid
+        rgba(255, 255, 255, 0.25);
+
+    background:
+        repeating-linear-gradient(
+            to top,
+            transparent 0,
+            transparent 44px,
+            rgba(255, 255, 255, 0.08) 45px
+        );
+}
+
+
+/* Один день */
+
+.chart-column {
+    position: relative;
+
+    height: 100%;
+
+    flex: 1;
+
+    max-width: 65px;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: center;
+}
+
+
+/* Стовпчик */
+
+.chart-bar {
+    position: relative;
+
+    width: 65%;
+
+    min-height: 4px;
+
+    border-radius:
+        8px 8px 3px 3px;
+
+    background:
+        linear-gradient(
+            to top,
+            rgba(84, 150, 160, 0.8),
+            rgba(160, 220, 215, 0.95)
+        );
+
+    box-shadow:
+        0 5px 15px
+        rgba(100, 200, 200, 0.2);
+
+    transform-origin: bottom;
+
+    animation:
+        chartGrow 0.7s ease forwards;
+
+    transition:
+        filter 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+/* Наведение */
+
+.chart-bar:hover {
+    transform:
+        scaleX(1.12);
+
+    filter:
+        brightness(1.2);
+}
+
+
+/* Значение над столбиком */
+
+.chart-value {
+    position: absolute;
+
+    top: -25px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    font-size: 11px;
+
+    white-space: nowrap;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.2s ease;
+}
+
+.chart-column:hover
+.chart-value {
+    opacity: 1;
+}
+
+
+/* День недели */
+
+.chart-day {
+    position: absolute;
+
+    bottom: -23px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    font-size: 11px;
+
+    opacity: 0.65;
+
+    white-space: nowrap;
+}
+
+
+/* Анімація */
+
+@keyframes chartGrow {
+
+    from {
+        transform:
+            scaleY(0);
+    }
+
+    to {
+        transform:
+            scaleY(1);
+    }
+
+}
+
+
+/* Телефон */
+
+@media (max-width: 600px) {
+
+    .tea-chart {
+        width: 94%;
+
+        padding: 16px;
+    }
+
+    .chart {
+        height: 190px;
+    }
+
+    .chart-area {
+        gap: 5px;
+
+        padding-left: 8px;
+    }
+
+    .chart-bar {
+        width: 75%;
+    }
+
+    .chart-header h2 {
+        font-size: 17px;
+    }
+
+    .chart-total {
+        font-size: 12px;
+    }
+
+}
 }
