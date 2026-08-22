@@ -2,6 +2,10 @@
    1. БАЗОВІ НАЛАШТУВАННЯ
 ========================================= */
 
+/* =========================================
+   1. БАЗОВІ НАЛАШТУВАННЯ
+========================================= */
+
 * {
     margin: 0;
     padding: 0;
@@ -702,30 +706,23 @@ body.dark {
 ========================================= */
 
 .main-button {
-
     position: relative;
-
-    left: 50%;
-
-    transform:
-        translateX(-50%);
 
     z-index: 20;
 
-    margin-top: 30px;
+    display: block;
+
+    margin: 30px auto 0 auto;
 
     padding: 20px 35px;
 
-    border:
-        1px solid var(--button-border);
+    border: 1px solid var(--button-border);
 
-    border-radius: 12px;
+    border-radius: 25px;
 
-    background:
-        var(--button-bg);
+    background: var(--button-bg);
 
-    color:
-        var(--button-text);
+    color: var(--button-text);
 
     font-size: 20px;
 
@@ -733,8 +730,10 @@ body.dark {
 
     cursor: pointer;
 
-    backdrop-filter:
-        blur(5px);
+    backdrop-filter: blur(8px);
+
+    box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.15);
 
     transition:
         transform 0.25s ease,
@@ -743,21 +742,7 @@ body.dark {
         color 0.4s ease;
 }
 
-.main-button:hover {
 
-    transform:
-        translateX(-50%)
-        translateY(-5px);
-
-    box-shadow:
-        0 10px 30px var(--shadow-color);
-}
-
-.main-button:active {
-
-    transform:
-        translateX(-50%);
-}
 
 
 /* =========================================
@@ -1696,4 +1681,614 @@ body.dark .background {
 .custom-forecast-result strong {
     font-size: 26px;
     font-weight: 600;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    min-height: 100%;
+
+    font-family: Arial, sans-serif;
+
+    overflow-x: hidden;
+}
+
+
+body {
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
+    background: linear-gradient(
+        180deg,
+        #6ec6ff,
+        #dff6ff
+    );
+}
+
+
+main {
+    flex: 1;
+
+    padding: 40px;
+
+    text-align: center;
+
+    position: relative;
+    z-index: 2;
+}
+
+
+/* ==========* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    min-height: 100%;
+
+    font-family: Arial, sans-serif;
+
+    overflow-x: hidden;
+}
+
+body {
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
+    background: linear-gradient(
+        180deg,
+        #6ec6ff,
+        #dff6ff
+    );
+}
+
+main {
+    flex: 1;
+
+    padding: 40px;
+
+    text-align: center;
+
+    position: relative;
+    z-index: 2;
+}
+
+/* =========================================
+   8. ПОГОДА
+========================================= */
+
+.weather-card {
+
+    position: relative;
+
+    z-index: 20;
+
+    width: 270px;
+
+    margin: 20px auto 0;
+
+    padding: 18px 20px;
+
+    border:
+        1px solid var(--button-border);
+
+    border-radius: 20px;
+
+    background:
+        var(--card-bg);
+
+    backdrop-filter:
+        blur(12px);
+
+    -webkit-backdrop-filter:
+        blur(12px);
+
+    color: var(--text-color);
+
+    box-shadow:
+        0 8px 30px var(--shadow-color);
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.weather-card:hover {
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 14px 35px var(--shadow-color);
+}
+
+
+.weather-top {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+}
+
+.weather-title {
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    opacity: 0.7;
+}
+
+.weather-status {
+
+    font-size: 12px;
+
+    padding: 4px 8px;
+
+    border-radius: 20px;
+
+    background:
+        var(--button-bg);
+
+    color:
+        var(--button-text);
+}
+
+
+.weather-main {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 15px;
+
+    margin: 5px 0 10px;
+}
+
+
+.weather-icon {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 65px;
+
+    height: 65px;
+
+    font-size: 52px;
+
+    filter:
+        drop-shadow(
+            0 5px 8px var(--shadow-color)
+        );
+
+    transition:
+        transform 0.4s ease;
+}
+
+.weather-card:hover .weather-icon {
+
+    transform:
+        scale(1.08)
+        rotate(3deg);
+}
+
+
+.weather-temperature {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    font-size: 48px;
+
+    font-weight: 300;
+
+    line-height: 1;
+}
+
+.weather-temperature small {
+
+    margin-top: 3px;
+
+    font-size: 18px;
+
+    opacity: 0.7;
+}
+
+
+.weather-bottom {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding-top: 10px;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, 0.2);
+}
+
+.weather-city {
+
+    font-size: 15px;
+
+    font-weight: 600;
+}
+
+.weather-description {
+
+    font-size: 13px;
+
+    opacity: 0.65;
+
+    text-align: right;
+}
+
+
+
+/* =================================
+   БЛОК ПОГОДИ
+================================= */
+
+.weather {
+
+    width: calc(100% - 30px);
+
+    margin: 15px;
+
+    padding: 20px 15px 25px;
+
+    text-align: center;
+
+    position: relative;
+
+    z-index: 20;
+
+    /* Заокруглення ВСІХ кутів */
+    border-radius: 30px;
+
+    background: rgba(255, 255, 255, 0.78);
+
+    backdrop-filter: blur(12px);
+
+    -webkit-backdrop-filter: blur(12px);
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.18);
+}
+
+
+/* =================================
+   ЗНАЧОК
+================================= */
+
+.weather-icon {
+
+    width: 85px;
+    height: 85px;
+
+    margin: 0 auto 7px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 55px;
+
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.7);
+
+    box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =================================
+   НАЗВА ПОГОДИ
+================================= */
+
+.weather-type {
+
+    font-size: 23px;
+
+    font-weight: bold;
+
+    margin-top: 5px;
+}
+
+
+/* =================================
+   ТЕМПЕРАТУРА
+================================= */
+
+.temperature {
+
+    font-size: 34px;
+
+    font-weight: bold;
+
+    margin: 5px 0 16px;
+}
+
+
+/* =================================
+   КНОПКИ
+================================= */
+
+.weather-buttons {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+.weather-buttons button,
+.rain-test {
+
+    border: none;
+
+    border-radius: 18px;
+
+    padding: 11px 18px;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+    color: white;
+
+    background: #3498db;
+
+    transition:
+        transform 0.2s,
+        background 0.2s,
+        box-shadow 0.2s;
+}
+
+.weather-buttons button:hover,
+.rain-test:hover {
+
+    transform: translateY(-2px);
+
+    background: #217dbb;
+
+    box-shadow:
+        0 5px 12px rgba(0, 0, 0, 0.15);
+}
+
+.weather-buttons button:active,
+.rain-test:active {
+
+    transform: scale(0.95);
+}
+
+
+/* ТЕСТ ДОЩУ */
+
+.rain-test {
+
+    margin-top: 10px;
+
+    background: #1769aa;
+}
+
+
+/* =================================
+   ЕФЕКТИ НА ВСЬОМУ ЕКРАНІ
+================================= */
+
+#weatherEffect {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    pointer-events: none;
+
+    z-index: 5;
+
+    overflow: hidden;
+}
+
+
+/* =================================
+   ДОЩ
+================================= */
+
+.rain-drop {
+
+    position: absolute;
+
+    top: -50px;
+
+    width: 2px;
+    height: 30px;
+
+    border-radius: 50%;
+
+    background: #258dcc;
+
+    opacity: 0.75;
+
+    animation: rainFall linear forwards;
+}
+
+@keyframes rainFall {
+
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(115vh);
+        opacity: 0;
+    }
+}
+
+
+/* =================================
+   СНІГ
+================================= */
+
+.snowflake {
+
+    position: absolute;
+
+    top: -50px;
+
+    color: white;
+
+    font-size: 22px;
+
+    filter:
+        drop-shadow(0 0 4px #999);
+
+    animation: snowFall linear forwards;
+}
+
+@keyframes snowFall {
+
+    0% {
+        transform:
+            translateY(0)
+            translateX(0)
+            rotate(0deg);
+    }
+
+    50% {
+        transform:
+            translateY(55vh)
+            translateX(30px)
+            rotate(180deg);
+    }
+
+    100% {
+        transform:
+            translateY(115vh)
+            translateX(-30px)
+            rotate(360deg);
+    }
+}
+
+
+/* =================================
+   ГРОЗА
+================================= */
+
+.lightning {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background:
+        rgba(255, 255, 255, 0.9);
+
+    pointer-events: none;
+
+    animation: lightningFlash 0.5s;
+
+}
+
+@keyframes lightningFlash {
+
+    0% {
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    25% {
+        opacity: 0;
+    }
+
+    45% {
+        opacity: 0.9;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+
+/* =================================
+   ТУМАН
+================================= */
+
+.fog {
+
+    position: fixed;
+
+    inset: -20%;
+
+    width: 140%;
+    height: 140%;
+
+    background:
+        rgba(220, 225, 230, 0.5);
+
+    filter: blur(25px);
+
+    animation:
+        fogMove 7s ease-in-out infinite alternate;
+
+}
+
+@keyframes fogMove {
+
+    from {
+        transform: translateX(-7%);
+    }
+
+    to {
+        transform: translateX(7%);
+    }
 }

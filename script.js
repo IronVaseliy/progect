@@ -194,28 +194,35 @@ let teaHistory =
    6. ДОДАВАННЯ ЧАЮ
 ========================================= */
 
-teaButton.addEventListener("click", () => {
+teaButton.addEventListener("click", function () {
 
+    // Беремо значення чашки
     let volume = Number(cupVolume.value);
-    const unit = volumeUnit.value;
 
-    /* Перевірка */
-    if (!volume || volume <= 0) {
+    // Перевірка
+    if (!Number.isFinite(volume) || volume <= 0) {
         alert("Вкажіть правильний об'єм чашки!");
         return;
     }
 
-    /* Літри → мілілітри */
-    if (unit === "l") {
-        volume = volume * 1000;
+    // Якщо літри — переводимо в мл
+    if (volumeUnit.value === "l") {
+        volume *= 1000;
     }
 
-    /* Загальна кількість */
+    // ОДНЕ натискання = ОДНА чашка
+    tea = Number(tea) || 0;
     tea += volume;
-    teaCount.textContent = formatVolume(tea);
-    localStorage.setItem("teaCount", tea);
 
-    /* Додаємо запис у історію */
+    // Показуємо результат
+    teaCount.textContent = formatVolume(tea);
+
+    // Зберігаємо сьогоднішню кількість
+    localStorage.setItem("teaCount", tea);
+    localStorage.setItem("teaCountDate", getDateKey());
+
+
+    // Додаємо тільки ОДИН запис в історію
     teaHistory.push({
         date: getDateKey(),
         volume: volume
@@ -226,9 +233,12 @@ teaButton.addEventListener("click", () => {
         JSON.stringify(teaHistory)
     );
 
-    /* Оновлюємо статистику ТА графік */
+
+    // Оновлюємо статистику
     updateStatistics();
-    updateTeaChart(); // 👈 ВИПРАВЛЕНО: графік оновлюється одразу!
+
+    // Оновлюємо графік
+    updateTeaChart();
 
 });
 
@@ -1155,5 +1165,518 @@ if (clearHistoryButton) {
         }
 
     });
+    /* =========================================
+   РОЗРАХУНОК ВЛАСНОГО ПРОГНОЗУ (За довільний період)
+========================================= */
+function updateCustomForecast() {
+    if (!customPeriodInput || !customPeriodUnit || !customForecastValue) return;
 
+    let periodValue = Number(customPeriodInput.value) || 0;
+    const unit = customPeriodUnit.value;
+
+    // Обмеження: максимум 1 рік (12 місяців або 365 днів)
+    if (unit === "months") {
+        customPeriodInput.max = "12";
+        if (periodValue > 12) {
+            periodValue = 12;
+            customPeriodInput.value = "12";
+        }
+    } else {
+        customPeriodInput.max = "365";
+        if (periodValue > 365) {
+            periodValue = 365;
+            customPeriodInput.value = "365";
+        }
+    }
+
+    // Якщо немає даних або значення 0
+    if (periodValue <= 0 || !teaHistory || teaHistory.length === 0) {
+        customForecastValue.textContent = "0 мл";
+        return;
+    }
+
+    // Середньодобова норма (за весь час ведення історії)
+    const uniqueDays = new Set(teaHistory.map(item => item.date)).size || 1;
+    const totalVolume = teaHistory.reduce((sum, item) => sum + (Number(item.volume) || 0), 0);
+    const dailyAverage = totalVolume / uniqueDays;
+
+    // Переведення в дні (місяць вважаємо як 30 днів)
+    const totalDays = unit === "months" ? periodValue * 30 : periodValue;
+
+    // Розрахунок прогнозованого об'єму
+    const forecastVolume = dailyAverage * totalDays;
+    customForecastValue.textContent = formatVolume(forecastVolume);
+}
+
+// Події зміни значення та вибору одиниці
+if (customPeriodInput && customPeriodUnit) {
+    customPeriodInput.addEventListener("input", updateCustomForecast);
+    customPeriodUnit.addEventListener("change", updateCustomForecast);
+}
+
+function calculatePeriod(startDate) {
+
+    let total = 0;
+
+
+    teaHistory.forEach(item => {
+
+        const itemDate =
+            new Date(
+                item.date + "T00:00:00"
+            );
+
+
+        if (itemDate >= startDate) {
+
+            total +=
+                Number(item.volume) || 0;
+
+        }
+
+    });
+
+
+    return total;
+}
+
+
+/* Змінні прогнозу */
+const forecastMonthStat = document.getElementById("forecastMonthStat");
+const forecast6MonthsStat = document.getElementById("forecast6MonthsStat");
+const forecastYearStat = document.getElementById("forecastYearStat");
+
+/* =========================================
+   РОЗРАХУНОК ПРОГНОЗУ (Скільки буде випито)
+========================================= */
+function calculateForecast() {
+    if (!teaHistory || teaHistory.length === 0) {
+        return { month: 0, sixMonths: 0, year: 0 };
+    }
+
+    // Кількість днів, у які вносилися записи
+    const uniqueDays = new Set(teaHistory.map(item => item.date)).size || 1;
+
+    // Загальний об'єм за весь час
+    const totalVolume = teaHistory.reduce((sum, item) => sum + (Number(item.volume) || 0), 0);
+
+    // Середнє значення випитого чаю за 1 день
+    const dailyAverage = totalVolume / uniqueDays;
+
+    return {
+        month: dailyAverage * 30,       // 30 днів
+        sixMonths: dailyAverage * 180,  // 6 місяців (~180 днів)
+        year: dailyAverage * 365        // 1 рік (365 днів)
+    };
+}
+
+/* =========================================
+   ОНОВЛЕННЯ СТАТИСТИКИ
+========================================= */
+function updateStatistics() {
+    // 1. Фактично випито
+    const month = calculatePeriod(getStartOfMonth());
+    const sixMonths = calculatePeriod(getStartOfSixMonths());
+    const year = calculatePeriod(getStartOfYear());
+
+    monthStat.textContent = formatVolume(month);
+    sixMonthsStat.textContent = formatVolume(sixMonths);
+    yearStat.textContent = formatVolume(year);
+
+    // 2. Прогноз (Орієнтовно буде випито)
+    const forecast = calculateForecast();
+
+    if (forecastMonthStat) forecastMonthStat.textContent = formatVolume(forecast.month);
+    if (forecast6MonthsStat) forecast6MonthsStat.textContent = formatVolume(forecast.sixMonths);
+    if (forecastYearStat) forecastYearStat.textContent = formatVolume(forecast.year);
+
+    updateCustomForecast();
+}
+
+
+  const weatherData = {
+
+    rain: {
+        icon: "🌧️",
+        name: "Дощ",
+        temperature: "+12°C"
+    },
+
+    snow: {
+        icon: "❄️",
+        name: "Сніг",
+        temperature: "-5°C"
+    },
+
+    storm: {
+        icon: "⛈️",
+        name: "Гроза",
+        temperature: "+10°C"
+    },
+
+    fog: {
+        icon: "🌫️",
+        name: "Туман",
+        temperature: "+7°C"
+    }
+
+};
+
+
+/* =================================
+   ПОТОЧНА ПОГОДА
+================================= */
+
+let currentWeather = "rain";
+
+
+/* =================================
+   ЗМІНА ПОГОДИ
+================================= */
+
+function changeWeather(type) {
+
+    if (!weatherData[type]) {
+        return;
+    }
+
+    currentWeather = type;
+
+    const weather = weatherData[type];
+
+
+    // Значок
+    document.getElementById("weatherIcon").textContent =
+        weather.icon;
+
+
+    // Назва
+    document.getElementById("weatherType").textContent =
+        weather.name;
+
+
+    // Температура
+    document.getElementById("temperature").textContent =
+        weather.temperature;
+
+
+    // Повністю очищаємо старий ефект
+    clearWeatherEffects();
+
+
+    // Запускаємо НОВУ погоду
+    startWeather(type);
+}
+
+
+/* =================================
+   ЗАПУСК ПОГОДИ
+================================= */
+
+function startWeather(type) {
+
+    if (type === "rain") {
+        startRain();
+    }
+
+    if (type === "snow") {
+        startSnow();
+    }
+
+    if (type === "storm") {
+        startStorm();
+    }
+
+    if (type === "fog") {
+        startFog();
+    }
+}
+
+
+/* =================================
+   ДОЩ — ПОСТІЙНИЙ
+================================= */
+
+let rainTimer = null;
+
+function startRain() {
+
+    // Краплі створюються постійно
+    rainTimer = setInterval(() => {
+
+        createRainDrop();
+
+        createRainDrop();
+
+        createRainDrop();
+
+    }, 70);
+}
+
+
+function createRainDrop() {
+
+    // Перевіряємо, що зараз саме дощ
+    if (currentWeather !== "rain" &&
+        currentWeather !== "storm") {
+
+        return;
+    }
+
+
+    const drop =
+        document.createElement("div");
+
+    drop.className =
+        "rain-drop";
+
+
+    drop.style.left =
+        Math.random() * 100 + "vw";
+
+
+    drop.style.animationDuration =
+        (0.45 + Math.random() * 0.6) + "s";
+
+
+    document
+        .getElementById("weatherEffect")
+        .appendChild(drop);
+
+
+    setTimeout(() => {
+
+        drop.remove();
+
+    }, 1500);
+}
+
+
+/* =================================
+   СНІГ — ПОСТІЙНИЙ
+================================= */
+
+let snowTimer = null;
+
+function startSnow() {
+
+    snowTimer = setInterval(() => {
+
+        createSnowflake();
+
+        createSnowflake();
+
+    }, 180);
+}
+
+
+function createSnowflake() {
+
+    if (currentWeather !== "snow") {
+        return;
+    }
+
+
+    const snow =
+        document.createElement("div");
+
+    snow.className =
+        "snowflake";
+
+    snow.textContent =
+        "❄";
+
+
+    snow.style.left =
+        Math.random() * 100 + "vw";
+
+
+    snow.style.fontSize =
+        (12 + Math.random() * 25) + "px";
+
+
+    snow.style.animationDuration =
+        (4 + Math.random() * 5) + "s";
+
+
+    document
+        .getElementById("weatherEffect")
+        .appendChild(snow);
+
+
+    setTimeout(() => {
+
+        snow.remove();
+
+    }, 10000);
+}
+
+
+/* =================================
+   ГРОЗА — ПОСТІЙНА
+================================= */
+
+let stormRainTimer = null;
+let stormLightningTimer = null;
+
+
+function startStorm() {
+
+    // Постійний дощ
+    stormRainTimer = setInterval(() => {
+
+        createRainDrop();
+        createRainDrop();
+        createRainDrop();
+
+    }, 80);
+
+
+    // Блискавки
+    stormLightningTimer = setInterval(() => {
+
+        createLightning();
+
+    }, 3000);
+}
+
+
+function createLightning() {
+
+    if (currentWeather !== "storm") {
+        return;
+    }
+
+
+    const lightning =
+        document.createElement("div");
+
+    lightning.className =
+        "lightning";
+
+
+    document
+        .getElementById("weatherEffect")
+        .appendChild(lightning);
+
+
+    setTimeout(() => {
+
+        lightning.remove();
+
+    }, 500);
+
+
+    // Другий короткий спалах
+    setTimeout(() => {
+
+        if (currentWeather !== "storm") {
+            return;
+        }
+
+        const second =
+            document.createElement("div");
+
+        second.className =
+            "lightning";
+
+
+        document
+            .getElementById("weatherEffect")
+            .appendChild(second);
+
+
+        setTimeout(() => {
+
+            second.remove();
+
+        }, 400);
+
+    }, 700);
+}
+
+
+/* =================================
+   ТУМАН — ПОСТІЙНИЙ
+================================= */
+
+function startFog() {
+
+    const fog =
+        document.createElement("div");
+
+    fog.className =
+        "fog";
+
+
+    document
+        .getElementById("weatherEffect")
+        .appendChild(fog);
+}
+
+
+/* =================================
+   ТЕСТ ДОЩУ
+================================= */
+
+function testRain() {
+
+    changeWeather("rain");
+
+}
+
+
+/* =================================
+   ОЧИЩЕННЯ СТАРОЇ ПОГОДИ
+================================= */
+
+function clearWeatherEffects() {
+
+    // Зупиняємо таймер дощу
+    if (rainTimer) {
+
+        clearInterval(rainTimer);
+
+        rainTimer = null;
+    }
+
+
+    // Зупиняємо таймер снігу
+    if (snowTimer) {
+
+        clearInterval(snowTimer);
+
+        snowTimer = null;
+    }
+
+
+    // Зупиняємо грозу
+    if (stormRainTimer) {
+
+        clearInterval(stormRainTimer);
+
+        stormRainTimer = null;
+    }
+
+
+    if (stormLightningTimer) {
+
+        clearInterval(stormLightningTimer);
+
+        stormLightningTimer = null;
+    }
+
+
+    // Видаляємо всі старі ефекти
+    document
+        .getElementById("weatherEffect")
+        .innerHTML = "";
+}
+
+
+/* =================================
+   ПОЧАТКОВА ПОГОДА
+================================= */
+
+changeWeather("rain");
 }

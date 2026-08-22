@@ -49,7 +49,7 @@
         </button>
 
 
-        <!-- Погода -->
+        <!-- Погода
         <section class="weather-card">
 
             <div class="weather-top">
@@ -65,10 +65,10 @@
                     ...
                 </span>
 
-            </div>
+            </div> -->
 
 
-            <div class="weather-main">
+            <!-- <div class="weather-main">
 
                 <div
                     class="weather-icon"
@@ -108,7 +108,7 @@
 
             </div>
 
-        </section>
+        </section> -->
         
 
         <!-- Об'єм чашки -->
@@ -278,28 +278,113 @@
     </div>
 
 </section>
+   <section class="weather-card">
+
+            <div class="weather-top">
+
+                <span class="weather-title">
+                    Погода зараз
+                </span>
+
+                <span
+                    class="weather-status"
+                    id="weatherStatus"
+                >
+                    ...
+                </span>
+
+            </div>
 
 
-        <!-- Сніг -->
-        <div
-            class="snow"
-            id="snow"
-        ></div>
+            <div class="weather-main">
+
+                <div
+                    class="weather-icon"
+                    id="weatherIcon"
+                >
+                    🌤️
+                </div>
+
+                <div class="weather-temperature">
+
+                    <span id="weatherTemperature">
+                        --
+                    </span>
+
+                    <small>°C</small>
+
+                </div>
+
+            </div>
 
 
-        <!-- Дощ -->
-        <div
-            class="rain"
-            id="rain"
-        ></div>
-        <!-- Тест дощу -->
-<button
-    class="rain-test-button"
-    id="rainTestButton"
-    type="button"
->
-    🌧️ Тест дощу
-</button>
+            <div class="weather-bottom">
+
+                <span
+                    class="weather-city"
+                    id="weatherCity"
+                >
+                    Завантаження...
+                </span>
+
+                <span
+                    class="weather-description"
+                    id="weatherText"
+                >
+                    Отримання погоди
+                </span>
+
+            </div>
+
+        </section>
+        
+
+
+
+
+    <!-- ПОГОДА -->
+    <section class="weather">
+
+        <div class="weather-icon" id="weatherIcon">
+            🌧️
+        </div>
+
+        <div class="weather-type" id="weatherType">
+            Дощ
+        </div>
+
+        <div class="temperature" id="temperature">
+            +12°C
+        </div>
+
+        <div class="weather-buttons">
+
+            <button onclick="changeWeather('rain')">
+                🌧️ Дощ
+            </button>
+
+            <button onclick="changeWeather('snow')">
+                ❄️ Сніг
+            </button>
+
+            <button onclick="changeWeather('storm')">
+                ⛈️ Гроза
+            </button>
+
+            <button onclick="changeWeather('fog')">
+                🌫️ Туман
+            </button>
+
+        </div>
+
+       
+
+    </section>
+
+    <!-- ЕФЕКТИ ПОГОДИ -->
+    <div id="weatherEffect"></div>
+
+
 
 
 
