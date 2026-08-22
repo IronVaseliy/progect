@@ -78,36 +78,225 @@ body.dark {
     --card-bg: rgba(20, 30, 40, 0.55);
 }
 
-
 /* =========================================
    4. ОСНОВНИЙ КОНТЕЙНЕР
 ========================================= */
 
 .container {
-
     position: relative;
-
     width: 92%;
-
-    max-width: 16
-    00px;
-
+    max-width: 1600px; /* 👈 ВИПРАВЛЕНО: прибрано перенос рядка */
     min-height: 90vh;
-
     margin: 30px auto;
-
     padding-bottom: 220px;
-
     overflow: hidden;
-
     border: 2px solid rgba(50, 150, 220, 0.7);
-
     border-radius: 8px;
-
     background: var(--background);
+    transition: background var(--transition);
+}
 
-    transition:
-        background var(--transition);
+/* ... інші базові стилі ... */
+
+
+/* =========================================
+   ТЕСТ ДОЩУ (ВИПРАВЛЕНО: винесено з media-запиту)
+========================================= */
+
+.rain-test-button {
+    position: relative;
+    display: block;
+    margin: 20px auto;
+    z-index: 100;
+    padding: 10px 18px;
+    border: 1px solid var(--button-border);
+    border-radius: 10px;
+    background: var(--button-bg);
+    color: var(--button-text);
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 5px 15px var(--shadow-color);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease;
+}
+
+.rain-test-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px var(--shadow-color);
+}
+
+
+/* =========================================
+   ГРАФІК ЧАЮ (ВИПРАВЛЕНО: винесено з media-запиту)
+========================================= */
+
+.tea-chart {
+    position: relative;
+    z-index: 20;
+    width: min(90%, 700px);
+    margin: 25px auto;
+    padding: 22px;
+    border-radius: 18px;
+    background: rgba(35, 50, 55, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    color: var(--button-text);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.chart-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.chart-header p {
+    margin-top: 5px;
+    font-size: 13px;
+    opacity: 0.65;
+}
+
+.chart-total {
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: var(--button-bg);
+    font-weight: bold;
+}
+
+.chart {
+    display: flex;
+    height: 230px;
+    width: 100%;
+}
+
+.chart-y {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 45px;
+    padding-bottom: 25px;
+    font-size: 11px;
+    opacity: 0.6;
+    text-align: right;
+}
+
+.chart-area {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    gap: 12px;
+    padding: 0 10px 25px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    background: repeating-linear-gradient(
+        to top,
+        transparent 0,
+        transparent 44px,
+        rgba(255, 255, 255, 0.08) 45px
+    );
+}
+
+.chart-column {
+    position: relative;
+    height: 100%;
+    flex: 1;
+    max-width: 65px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.chart-bar {
+    position: relative;
+    width: 65%;
+    min-height: 4px;
+    border-radius: 8px 8px 3px 3px;
+    background: linear-gradient(
+        to top,
+        rgba(84, 150, 160, 0.8),
+        rgba(160, 220, 215, 0.95)
+    );
+    box-shadow: 0 5px 15px rgba(100, 200, 200, 0.2);
+    transform-origin: bottom;
+    animation: chartGrow 0.7s ease forwards;
+    transition: filter 0.25s ease, transform 0.25s ease;
+}
+
+.chart-bar:hover {
+    transform: scaleX(1.12);
+    filter: brightness(1.2);
+}
+
+.chart-value {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.chart-column:hover .chart-value {
+    opacity: 1;
+}
+
+.chart-day {
+    position: absolute;
+    bottom: -23px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    opacity: 0.65;
+    white-space: nowrap;
+}
+
+@keyframes chartGrow {
+    from {
+        transform: scaleY(0);
+    }
+    to {
+        transform: scaleY(1);
+    }
+}
+
+/* МЕДІА ЗАПИТИ ДЛЯ АДАПТИВУ */
+
+@media (max-width: 600px) {
+    .tea-chart {
+        width: 94%;
+        padding: 16px;
+    }
+
+    .chart {
+        height: 190px;
+    }
+
+    .chart-area {
+        gap: 5px;
+        padding-left: 8px;
+    }
+
+    .chart-bar {
+        width: 75%;
+    }
+
+    .chart-header h2 {
+        font-size: 17px;
+    }
+
+    .chart-total {
+        font-size: 12px;
+    }
 }
 
 
@@ -1356,4 +1545,155 @@ body.dark .background {
     }
 
 }
+}
+/* Двоколоночна сітка для статистики */
+.stats-two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.stats-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stats-column h3 {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 500;
+    opacity: 0.85;
+    margin-bottom: 5px;
+}
+
+/* Адаптивність для смартфонів */
+@media (max-width: 650px) {
+    .stats-two-columns {
+        grid-template-columns: 1fr;
+    }
+}
+/* =========================================
+   КНОПКА ОЧИЩЕННЯ ІСТОРІЇ
+========================================= */
+
+.clear-history-button {
+    display: block;
+    margin: 25px auto 0;
+    padding: 10px 22px;
+
+    border: 1px solid var(--button-border);
+    border-radius: 12px;
+
+    background: rgba(220, 50, 50, 0.2);
+    color: var(--text-color);
+
+    font-size: 15px;
+    font-family: inherit;
+
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+
+    transition:
+        transform 0.25s ease,
+        background 0.3s ease,
+        box-shadow 0.25s ease;
+}
+
+.clear-history-button:hover {
+    transform: translateY(-3px);
+    background: rgba(220, 50, 50, 0.4);
+    box-shadow: 0 6px 18px var(--shadow-color);
+}
+
+.clear-history-button:active {
+    transform: translateY(0);
+}
+
+/* =========================================
+   КАЛЬКУЛЯТОР ВЛАСНОГО ПРОГНОЗУ
+========================================= */
+
+.custom-forecast-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.custom-forecast-section h3 {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    opacity: 0.9;
+}
+
+.custom-forecast-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border: 1px solid var(--button-border);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(5px);
+}
+
+.custom-forecast-inputs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.custom-forecast-inputs label {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.custom-forecast-inputs input,
+.custom-forecast-inputs select {
+    padding: 8px 12px;
+    border: 1px solid var(--button-border);
+    border-radius: 8px;
+    background: var(--button-bg);
+    color: var(--button-text);
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-forecast-inputs input {
+    width: 85px;
+    text-align: center;
+}
+
+.custom-forecast-inputs select {
+    cursor: pointer;
+}
+
+.custom-forecast-inputs input:focus,
+.custom-forecast-inputs select:focus {
+    box-shadow: 0 0 0 2px rgba(50, 150, 220, 0.4);
+}
+
+.custom-forecast-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.custom-forecast-result span {
+    font-size: 14px;
+    opacity: 0.75;
+}
+
+.custom-forecast-result strong {
+    font-size: 26px;
+    font-weight: 600;
 }

@@ -124,6 +124,7 @@
                     type="number"
                     id="cupVolume"
                     min="1"
+                    max="1000"
                     step="1"
                     value="250"
                 >
@@ -168,80 +169,82 @@
 
 
         <!-- Статистика -->
-        <section class="statistics">
+        <!-- Статистика та Прогноз (Один контейнер) -->
 
-            <h2>
-                Статистика чаю
-            </h2>
+    <!-- Статистика -->
+<section class="statistics">
 
+    <h2>Статистика споживання чаю</h2>
 
-            <div class="statistics-grid">
+    <div class="stats-two-columns">
+        <!-- Колонка 1: Фактично випито -->
+        <div class="stats-column">
+            <h3>Фактично випито</h3>
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-title">За місяць</div>
+                <div class="stat-value" id="monthStat">0 мл</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-title">За 6 місяців</div>
+                <div class="stat-value" id="sixMonthsStat">0 мл</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-title">За рік</div>
+                <div class="stat-value" id="yearStat">0 мл</div>
+            </div>
+        </div>
 
-                <!-- Місяць -->
-                <div class="stat-card">
+        <!-- Колонка 2: Орієнтовно буде випито -->
+        <div class="stats-column">
+            <h3>Орієнтовно буде випито</h3>
+            <div class="stat-card">
+                <div class="stat-icon">🔮</div>
+                <div class="stat-title">За місяць</div>
+                <div class="stat-value" id="forecastMonthStat">0 мл</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-title">За 6 місяців</div>
+                <div class="stat-value" id="forecast6MonthsStat">0 мл</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-title">За рік</div>
+                <div class="stat-value" id="forecastYearStat">0 мл</div>
+            </div>
+        </div>
+    </div>
+    <!-- Калькулятор власного прогнозу -->
+    <div class="custom-forecast-section">
+        <h3>Калькулятор прогнозу споживання</h3>
 
-                    <div class="stat-icon">
-                        📅
-                    </div>
-
-                    <div class="stat-title">
-                        За місяць
-                    </div>
-
-                    <div
-                        class="stat-value"
-                        id="monthStat"
-                    >
-                        0 мл
-                    </div>
-
-                </div>
-
-
-                <!-- 6 місяців -->
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        📊
-                    </div>
-
-                    <div class="stat-title">
-                        За 6 місяців
-                    </div>
-
-                    <div
-                        class="stat-value"
-                        id="sixMonthsStat"
-                    >
-                        0 мл
-                    </div>
-
-                </div>
-
-
-                <!-- Рік -->
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        📈
-                    </div>
-
-                    <div class="stat-title">
-                        За рік
-                    </div>
-
-                    <div
-                        class="stat-value"
-                        id="yearStat"
-                    >
-                        0 мл
-                    </div>
-
-                </div>
-
+        <div class="custom-forecast-card">
+            <div class="custom-forecast-inputs">
+                <label for="customPeriodInput">Обрати період:</label>
+                <input type="number" id="customPeriodInput" min="1" max="365" value="7">
+                <select id="customPeriodUnit">
+                    <option value="days">днів</option>
+                    <option value="months">місяців</option>
+                </select>
             </div>
 
-        </section>
+            <div class="custom-forecast-result">
+                <span>Орієнтовно вип'єте:</span>
+                <strong id="customForecastValue">0 мл</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кнопка очищення історії -->
+    <button class="clear-history-button" id="clearHistoryButton" type="button">
+        🗑️ Очистити історію
+    </button>
+
+</section>
+
         <!-- Графік за останні 7 днів -->
 <section class="tea-chart">
 

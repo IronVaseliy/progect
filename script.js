@@ -50,6 +50,10 @@ const sixMonthsStat =
 const yearStat =
     document.getElementById("yearStat");
 
+/* Калькулятор власного прогнозу */
+const customPeriodInput = document.getElementById("customPeriodInput");
+const customPeriodUnit = document.getElementById("customPeriodUnit");
+const customForecastValue = document.getElementById("customForecastValue");    
 
 /* =========================================
    1. ТЕМА ДЕНЬ / НІЧ
@@ -186,75 +190,120 @@ let teaHistory =
    6. ДОДАВАННЯ ЧАЮ
 ========================================= */
 
+/* =========================================
+   6. ДОДАВАННЯ ЧАЮ
+========================================= */
+
 teaButton.addEventListener("click", () => {
 
-    let volume =
-        Number(cupVolume.value);
-
-    const unit =
-        volumeUnit.value;
-
+    let volume = Number(cupVolume.value);
+    const unit = volumeUnit.value;
 
     /* Перевірка */
-
     if (!volume || volume <= 0) {
-
-        alert(
-            "Вкажіть правильний об'єм чашки!"
-        );
-
+        alert("Вкажіть правильний об'єм чашки!");
         return;
     }
 
-
     /* Літри → мілілітри */
-
     if (unit === "l") {
-
-        volume =
-            volume * 1000;
+        volume = volume * 1000;
     }
 
-
     /* Загальна кількість */
-
     tea += volume;
-
-
-    teaCount.textContent =
-        formatVolume(tea);
-
-
-    localStorage.setItem(
-        "teaCount",
-        tea
-    );
-
+    teaCount.textContent = formatVolume(tea);
+    localStorage.setItem("teaCount", tea);
 
     /* Додаємо запис у історію */
-
     teaHistory.push({
-
-        date:
-            getDateKey(),
-
-        volume:
-            volume
-
+        date: getDateKey(),
+        volume: volume
     });
-
 
     localStorage.setItem(
         "teaHistory",
         JSON.stringify(teaHistory)
     );
 
-
-    /* Оновлюємо статистику */
-
+    /* Оновлюємо статистику ТА графік */
     updateStatistics();
+    updateTeaChart(); // 👈 ВИПРАВЛЕНО: графік оновлюється одразу!
 
 });
+
+
+/* =========================================
+   ГРАФІК ЗА ОСТАННІ 7 ДНІВ
+========================================= */
+
+function updateTeaChart() {
+
+    const chartArea = document.getElementById("chartArea");
+    const chartTotal = document.getElementById("chartTotal");
+
+    if (!chartArea) return;
+
+    chartArea.innerHTML = "";
+
+    const history = JSON.parse(localStorage.getItem("teaHistory")) || [];
+
+    /* Останні 7 днів */
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        days.push({
+            key: getDateKey(date),
+            date: date,
+            volume: 0
+        });
+    }
+
+    /* Знаходимо чай за кожен день */
+    history.forEach(item => {
+        const day = days.find(d => d.key === item.date);
+        if (day) {
+            day.volume += Number(item.volume) || 0;
+        }
+    });
+
+    /* 👈 ВИПРАВЛЕНО: Максимальне значення 2000 мл (відповідає шкалі 2 л у HTML) */
+    const maxVolume = Math.max(...days.map(d => d.volume), 2000);
+
+    /* Загальна кількість */
+    const total = days.reduce((sum, day) => sum + day.volume, 0);
+    chartTotal.textContent = formatVolume(total);
+
+    /* Створюємо стовпчики */
+    days.forEach(day => {
+        const column = document.createElement("div");
+        column.className = "chart-column";
+
+        const bar = document.createElement("div");
+        bar.className = "chart-bar";
+
+        /* Висота */
+        const height = (day.volume / maxVolume) * 100;
+        bar.style.height = `${Math.max(height, 2)}%`;
+
+        /* Значення */
+        const value = document.createElement("span");
+        value.className = "chart-value";
+        value.textContent = formatVolume(day.volume);
+
+        /* День */
+        const dayName = document.createElement("span");
+        dayName.className = "chart-day";
+        dayName.textContent = day.date.toLocaleDateString("uk-UA", { weekday: "short" });
+
+        bar.appendChild(value);
+        column.appendChild(bar);
+        column.appendChild(dayName);
+        chartArea.appendChild(column);
+    });
+
+}
 
 
 /* =========================================
@@ -311,6 +360,54 @@ function getStartOfYear() {
 /* =========================================
    10. ПІДРАХУНОК СТАТИСТИКИ
 ========================================= */
+/* =========================================
+   РОЗРАХУНОК ВЛАСНОГО ПРОГНОЗУ (За довільний період)
+========================================= */
+function updateCustomForecast() {
+    if (!customPeriodInput || !customPeriodUnit || !customForecastValue) return;
+
+    let periodValue = Number(customPeriodInput.value) || 0;
+    const unit = customPeriodUnit.value;
+
+    // Обмеження: максимум 1 рік (12 місяців або 365 днів)
+    if (unit === "months") {
+        customPeriodInput.max = "12";
+        if (periodValue > 12) {
+            periodValue = 12;
+            customPeriodInput.value = "12";
+        }
+    } else {
+        customPeriodInput.max = "365";
+        if (periodValue > 365) {
+            periodValue = 365;
+            customPeriodInput.value = "365";
+        }
+    }
+
+    // Якщо немає даних або значення 0
+    if (periodValue <= 0 || !teaHistory || teaHistory.length === 0) {
+        customForecastValue.textContent = "0 мл";
+        return;
+    }
+
+    // Середньодобова норма (за весь час ведення історії)
+    const uniqueDays = new Set(teaHistory.map(item => item.date)).size || 1;
+    const totalVolume = teaHistory.reduce((sum, item) => sum + (Number(item.volume) || 0), 0);
+    const dailyAverage = totalVolume / uniqueDays;
+
+    // Переведення в дні (місяць вважаємо як 30 днів)
+    const totalDays = unit === "months" ? periodValue * 30 : periodValue;
+
+    // Розрахунок прогнозованого об'єму
+    const forecastVolume = dailyAverage * totalDays;
+    customForecastValue.textContent = formatVolume(forecastVolume);
+}
+
+// Події зміни значення та вибору одиниці
+if (customPeriodInput && customPeriodUnit) {
+    customPeriodInput.addEventListener("input", updateCustomForecast);
+    customPeriodUnit.addEventListener("change", updateCustomForecast);
+}
 
 function calculatePeriod(startDate) {
 
@@ -339,42 +436,61 @@ function calculatePeriod(startDate) {
 }
 
 
+/* Змінні прогнозу */
+const forecastMonthStat = document.getElementById("forecastMonthStat");
+const forecast6MonthsStat = document.getElementById("forecast6MonthsStat");
+const forecastYearStat = document.getElementById("forecastYearStat");
+
+/* =========================================
+   РОЗРАХУНОК ПРОГНОЗУ (Скільки буде випито)
+========================================= */
+function calculateForecast() {
+    if (!teaHistory || teaHistory.length === 0) {
+        return { month: 0, sixMonths: 0, year: 0 };
+    }
+
+    // Кількість днів, у які вносилися записи
+    const uniqueDays = new Set(teaHistory.map(item => item.date)).size || 1;
+
+    // Загальний об'єм за весь час
+    const totalVolume = teaHistory.reduce((sum, item) => sum + (Number(item.volume) || 0), 0);
+
+    // Середнє значення випитого чаю за 1 день
+    const dailyAverage = totalVolume / uniqueDays;
+
+    return {
+        month: dailyAverage * 30,       // 30 днів
+        sixMonths: dailyAverage * 180,  // 6 місяців (~180 днів)
+        year: dailyAverage * 365        // 1 рік (365 днів)
+    };
+}
+
+/* =========================================
+   ОНОВЛЕННЯ СТАТИСТИКИ
+========================================= */
+function updateStatistics() {
+    // 1. Фактично випито
+    const month = calculatePeriod(getStartOfMonth());
+    const sixMonths = calculatePeriod(getStartOfSixMonths());
+    const year = calculatePeriod(getStartOfYear());
+
+    monthStat.textContent = formatVolume(month);
+    sixMonthsStat.textContent = formatVolume(sixMonths);
+    yearStat.textContent = formatVolume(year);
+
+    // 2. Прогноз (Орієнтовно буде випито)
+    const forecast = calculateForecast();
+
+    if (forecastMonthStat) forecastMonthStat.textContent = formatVolume(forecast.month);
+    if (forecast6MonthsStat) forecast6MonthsStat.textContent = formatVolume(forecast.sixMonths);
+    if (forecastYearStat) forecastYearStat.textContent = formatVolume(forecast.year);
+
+    updateCustomForecast();
+}
+
 /* =========================================
    11. ОНОВЛЕННЯ СТАТИСТИКИ
 ========================================= */
-
-function updateStatistics() {
-
-    const month =
-        calculatePeriod(
-            getStartOfMonth()
-        );
-
-
-    const sixMonths =
-        calculatePeriod(
-            getStartOfSixMonths()
-        );
-
-
-    const year =
-        calculatePeriod(
-            getStartOfYear()
-        );
-
-
-    monthStat.textContent =
-        formatVolume(month);
-
-
-    sixMonthsStat.textContent =
-        formatVolume(sixMonths);
-
-
-    yearStat.textContent =
-        formatVolume(year);
-}
-
 
 /* =========================================
    12. СТВОРЕННЯ СНІГУ
@@ -969,3 +1085,75 @@ function updateTeaChart() {
 ========================================= */
 
 updateTeaChart();
+/* =========================================
+   ОБМЕЖЕННЯ ВВОДУ В ПОЛІ (MAX 1L / 1000ML)
+========================================= */
+function updateCupVolumeLimits() {
+    if (volumeUnit.value === "l") {
+        cupVolume.max = "1";
+        if (Number(cupVolume.value) > 1) {
+            cupVolume.value = "1";
+        }
+    } else {
+        cupVolume.max = "1000";
+        if (Number(cupVolume.value) > 1000) {
+            cupVolume.value = "1000";
+        }
+    }
+}
+
+// При зміні одиниці виміру (мл/л) оновлюємо максимум
+volumeUnit.addEventListener("change", updateCupVolumeLimits);
+
+// При введенні значення не даємо ввести більше максимуму
+cupVolume.addEventListener("input", () => {
+    const maxLimit = volumeUnit.value === "l" ? 1 : 1000;
+    if (Number(cupVolume.value) > maxLimit) {
+        cupVolume.value = maxLimit;
+    }
+});
+
+/* =========================================
+   ОЧИЩЕННЯ ІСТОРІЇ ТА LOCAL STORAGE
+========================================= */
+
+const clearHistoryButton = 
+    document.getElementById("clearHistoryButton");
+
+if (clearHistoryButton) {
+
+    clearHistoryButton.addEventListener("click", () => {
+
+        const isConfirmed = confirm(
+            "Ви дійсно бажаєте очистити всю історію з LocalStorage та скинути лічильники?"
+        );
+
+        if (isConfirmed) {
+
+            // 1. Повністю видаляємо ключі з LocalStorage
+            localStorage.removeItem("teaCount");
+            localStorage.removeItem("teaCountDate");
+            localStorage.removeItem("teaHistory");
+
+            // 2. Скидаємо змінні в пам'яті програмного коду
+            tea = 0;
+            teaHistory = [];
+
+            // 3. Оновлюємо лічильник за сьогодні на екрані
+            if (teaCount) {
+                teaCount.textContent = formatVolume(0);
+            }
+
+            // 4. Перераховуємо статистику та оновлюємо графік
+            updateStatistics();
+
+            if (typeof updateTeaChart === "function") {
+                updateTeaChart();
+            }
+
+            alert("LocalStorage та історію успішно очищено!");
+        }
+
+    });
+
+}
