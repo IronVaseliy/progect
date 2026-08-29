@@ -396,7 +396,55 @@
 
     <script src="script.js"></script>
 
-</body>
+</body> 
+<!-- =========================================
+     КВЕСТЫ
+========================================= -->
+
+<section class="quests-section">
+
+    <div class="quests-header">
+        <div>
+            <h2>🏆 Квести</h2>
+            <p>Виконуй завдання та отримуй нагороди</p>
+        </div>
+
+        <div class="quests-counter">
+            <span id="questsCompleted">0</span>
+            /
+            <span id="questsTotal">0</span>
+        </div>
+    </div>
+
+
+    <!-- Список квестів -->
+
+    <div id="questsList" class="quests-list">
+        <!-- Квести створюються через JavaScript -->
+    </div>
+
+
+    <!-- Повідомлення про нагороду -->
+
+    <div id="questNotification" class="quest-notification">
+
+        <div class="quest-notification-icon">
+            🏆
+        </div>
+
+        <div>
+            <strong id="questNotificationTitle">
+                Квест виконано!
+            </strong>
+
+            <span id="questNotificationText">
+                Ти отримав нагороду!
+            </span>
+        </div>
+
+    </div>
+
+</section>
 
 
 </html>

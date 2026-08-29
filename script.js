@@ -233,6 +233,8 @@ teaButton.addEventListener("click", function () {
         JSON.stringify(teaHistory)
     );
 
+    checkQuests();
+
 
     // Оновлюємо статистику
     updateStatistics();
@@ -1680,3 +1682,574 @@ function clearWeatherEffects() {
 
 changeWeather("rain");
 }
+/* =========================================
+   🏆 СИСТЕМА КВЕСТІВ
+========================================= */
+
+
+/* =========================================
+   ЕЛЕМЕНТИ HTML
+========================================= */
+
+const questsList =
+    document.getElementById("questsList");
+
+const questsCompleted =
+    document.getElementById("questsCompleted");
+
+const questsTotal =
+    document.getElementById("questsTotal");
+
+const questNotification =
+    document.getElementById("questNotification");
+
+const questNotificationTitle =
+    document.getElementById("questNotificationTitle");
+
+const questNotificationText =
+    document.getElementById("questNotificationText");
+
+
+/* =========================================
+   СПИСОК КВЕСТІВ
+========================================= */
+
+const quests = [
+
+    {
+        id: "first_cup",
+
+        icon: "🍵",
+
+        title: "Перша чашка",
+
+        description:
+            "Випий свою першу чашку чаю.",
+
+        target: 1,
+
+        type: "cups",
+
+        reward: "🏆 Новачок"
+    },
+
+
+    {
+        id: "three_cups",
+
+        icon: "☕",
+
+        title: "Чайний день",
+
+        description:
+            "Випий 3 чашки чаю за один день.",
+
+        target: 3,
+
+        type: "daily_cups",
+
+        reward: "⭐ Чайний любитель"
+    },
+
+
+    {
+        id: "one_liter",
+
+        icon: "🫖",
+
+        title: "Велика кружка",
+
+        description:
+            "Випий 1 літр чаю за один день.",
+
+        target: 1000,
+
+        type: "daily_volume",
+
+        reward: "🔥 Велика кружка"
+    },
+
+
+    {
+        id: "ten_liters",
+
+        icon: "🌱",
+
+        title: "Любитель чаю",
+
+        description:
+            "Випий 10 літрів чаю загалом.",
+
+        target: 10000,
+
+        type: "total_volume",
+
+        reward: "🏆 Любитель чаю"
+    },
+
+
+    {
+        id: "fifty_liters",
+
+        icon: "👑",
+
+        title: "Чайний майстер",
+
+        description:
+            "Випий 50 літрів чаю загалом.",
+
+        target: 50000,
+
+        type: "total_volume",
+
+        reward: "👑 Чайний майстер"
+    },
+
+
+    {
+        id: "hundred_liters",
+
+        icon: "💎",
+
+        title: "Чайна легенда",
+
+        description:
+            "Випий 100 літрів чаю загалом.",
+
+        target: 100000,
+
+        type: "total_volume",
+
+        reward: "💎 Легенда"
+    },
+
+
+    {
+        id: "seven_days",
+
+        icon: "📅",
+
+        title: "Тиждень чаю",
+
+        description:
+            "Пий чай 7 різних днів.",
+
+        target: 7,
+
+        type: "unique_days",
+
+        reward: "🔥 Тиждень без перерви"
+    }
+
+];
+
+
+/* =========================================
+   ВИКОНАНІ КВЕСТИ
+========================================= */
+
+let completedQuests =
+    JSON.parse(
+        localStorage.getItem("completedQuests")
+    ) || [];
+
+
+/* =========================================
+   ЗБЕРЕЖЕННЯ
+========================================= */
+
+function saveCompletedQuests() {
+
+    localStorage.setItem(
+        "completedQuests",
+        JSON.stringify(completedQuests)
+    );
+
+}
+
+
+/* =========================================
+   ОТРИМАННЯ ПРОГРЕСУ
+========================================= */
+
+function getQuestProgress(quest) {
+
+    if (!teaHistory ||
+        teaHistory.length === 0) {
+
+        return 0;
+    }
+
+
+    /* -----------------------------
+       ВСІ ЧАШКИ
+    ----------------------------- */
+
+    if (quest.type === "cups") {
+
+        return teaHistory.length;
+    }
+
+
+    /* -----------------------------
+       ЧАШКИ СЬОГОДНІ
+    ----------------------------- */
+
+    if (quest.type === "daily_cups") {
+
+        const today =
+            getDateKey();
+
+        return teaHistory.filter(
+            item =>
+                item.date === today
+        ).length;
+    }
+
+
+    /* -----------------------------
+       ОБ'ЄМ СЬОГОДНІ
+    ----------------------------- */
+
+    if (quest.type === "daily_volume") {
+
+        const today =
+            getDateKey();
+
+        return teaHistory
+
+            .filter(
+                item =>
+                    item.date === today
+            )
+
+            .reduce(
+                (sum, item) =>
+                    sum +
+                    (Number(item.volume) || 0),
+
+                0
+            );
+    }
+
+
+    /* -----------------------------
+       ЗАГАЛЬНИЙ ОБ'ЄМ
+    ----------------------------- */
+
+    if (quest.type === "total_volume") {
+
+        return teaHistory.reduce(
+            (sum, item) =>
+                sum +
+                (Number(item.volume) || 0),
+
+            0
+        );
+    }
+
+
+    /* -----------------------------
+       УНІКАЛЬНІ ДНІ
+    ----------------------------- */
+
+    if (quest.type === "unique_days") {
+
+        return new Set(
+            teaHistory.map(
+                item =>
+                    item.date
+            )
+        ).size;
+    }
+
+
+    return 0;
+}
+
+
+/* =========================================
+   ФОРМАТУВАННЯ ПРОГРЕСУ
+========================================= */
+
+function formatQuestProgress(
+    quest,
+    progress
+) {
+
+    if (
+        quest.type === "daily_volume" ||
+        quest.type === "total_volume"
+    ) {
+
+        return (
+            formatVolume(progress) +
+            " / " +
+            formatVolume(quest.target)
+        );
+
+    }
+
+
+    return (
+        Math.min(
+            progress,
+            quest.target
+        ) +
+        " / " +
+        quest.target
+    );
+
+}
+
+
+/* =========================================
+   ПОКАЗ НАГОРОДИ
+========================================= */
+
+function showQuestNotification(
+    quest
+) {
+
+    if (!questNotification) {
+        return;
+    }
+
+
+    questNotificationTitle.textContent =
+        "🏆 Квест виконано!";
+
+
+    questNotificationText.textContent =
+        quest.title +
+        " — " +
+        quest.reward;
+
+
+    questNotification.classList.add(
+        "show"
+    );
+
+
+    setTimeout(() => {
+
+        questNotification.classList.remove(
+            "show"
+        );
+
+    }, 4000);
+
+}
+
+
+/* =========================================
+   ПЕРЕВІРКА КВЕСТІВ
+========================================= */
+
+function checkQuests() {
+
+    quests.forEach(quest => {
+
+        /* Вже виконаний */
+
+        if (
+            completedQuests.includes(
+                quest.id
+            )
+        ) {
+
+            return;
+        }
+
+
+        const progress =
+            getQuestProgress(
+                quest
+            );
+
+
+        /* Квест виконаний */
+
+        if (
+            progress >= quest.target
+        ) {
+
+            completedQuests.push(
+                quest.id
+            );
+
+
+            saveCompletedQuests();
+
+
+            showQuestNotification(
+                quest
+            );
+
+        }
+
+    });
+
+
+    renderQuests();
+
+}
+
+
+/* =========================================
+   СТВОРЕННЯ КАРТКИ
+========================================= */
+
+function createQuestCard(
+    quest
+) {
+
+    const progress =
+        getQuestProgress(
+            quest
+        );
+
+
+    const completed =
+        completedQuests.includes(
+            quest.id
+        );
+
+
+    const percent =
+        Math.min(
+            (progress / quest.target) * 100,
+            100
+        );
+
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+
+    card.className =
+        "quest-card";
+
+
+    if (completed) {
+
+        card.classList.add(
+            "completed"
+        );
+
+    }
+
+
+    card.innerHTML = `
+
+        <div class="quest-icon">
+            ${quest.icon}
+        </div>
+
+        <div class="quest-title">
+            ${quest.title}
+        </div>
+
+        <div class="quest-description">
+            ${quest.description}
+        </div>
+
+        <div class="quest-progress-text">
+
+            <span>
+                Прогрес
+            </span>
+
+            <span>
+                ${formatQuestProgress(
+                    quest,
+                    progress
+                )}
+            </span>
+
+        </div>
+
+        <div class="quest-progress">
+
+            <div
+                class="quest-progress-bar"
+                style="width: ${percent}%"
+            ></div>
+
+        </div>
+
+        <div class="quest-reward">
+
+            🎁 Нагорода:
+            ${quest.reward}
+
+        </div>
+
+    `;
+
+
+    return card;
+}
+
+
+/* =========================================
+   ВІДОБРАЖЕННЯ КВЕСТІВ
+========================================= */
+
+function renderQuests() {
+
+    if (!questsList) {
+        return;
+    }
+
+
+    questsList.innerHTML =
+        "";
+
+
+    quests.forEach(
+        quest => {
+
+            const card =
+                createQuestCard(
+                    quest
+                );
+
+
+            questsList.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    /* Лічильник */
+
+    if (questsTotal) {
+
+        questsTotal.textContent =
+            quests.length;
+
+    }
+
+
+    if (questsCompleted) {
+
+        questsCompleted.textContent =
+            completedQuests.length;
+
+    }
+
+}
+
+
+/* =========================================
+   ЗАПУСК
+========================================= */
+
+renderQuests();
+
+checkQuests();
