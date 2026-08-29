@@ -1,2890 +1,743 @@
-/* =========================================
-   1. БАЗОВІ НАЛАШТУВАННЯ
-========================================= */
-
-/* =========================================
-   1. БАЗОВІ НАЛАШТУВАННЯ
-========================================= */
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-html {
-    scroll-behavior: smooth;
+:root {
+    --background: #b9e8ed;
+    --text-color: #111;
+    --button-bg: rgba(155, 216, 213, .78);
+    --button-text: #111;
+    --button-border: rgba(255,255,255,.45);
+    --shadow-color: rgba(0,0,0,.25);
+    --card-bg: rgba(255,255,255,.28);
+    --transition: .35s ease;
 }
+
+body.dark {
+    --background: #101820;
+    --text-color: #fff;
+    --button-bg: rgba(38,61,74,.88);
+    --button-text: #fff;
+    --button-border: rgba(255,255,255,.15);
+    --shadow-color: rgba(0,0,0,.6);
+    --card-bg: rgba(20,30,40,.62);
+}
+
+html { scroll-behavior: smooth; }
 
 body {
     min-height: 100vh;
-
     font-family: Arial, sans-serif;
-
     color: var(--text-color);
-
     background: var(--background);
-
-    transition:
-        background 0.5s ease,
-        color 0.5s ease;
-
+    transition: background var(--transition), color var(--transition);
     overflow-x: hidden;
 }
 
+button, input, select { font: inherit; }
 
-/* =========================================
-   2. ЗМІННІ — СВІТЛА ТЕМА
-========================================= */
-
-:root {
-
-    --background: #b9e8ed;
-
-    --text-color: #111;
-
-    --button-bg: rgba(155, 216, 213, 0.75);
-
-    --button-text: #111;
-
-    --button-border: rgba(255, 255, 255, 0.4);
-
-    --shadow-color: rgba(0, 0, 0, 0.25);
-
-    --fog-color: rgba(255, 255, 255, 0.6);
-
-    --card-bg: rgba(255, 255, 255, 0.25);
-
-    --transition: 0.4s ease;
-}
-
-
-/* =========================================
-   3. ТЕМНА ТЕМА
-========================================= */
-
-body.dark {
-
-    --background: #101820;
-
-    --text-color: #ffffff;
-
-    --button-bg: rgba(38, 61, 74, 0.85);
-
-    --button-text: #ffffff;
-
-    --button-border: rgba(255, 255, 255, 0.15);
-
-    --shadow-color: rgba(0, 0, 0, 0.6);
-
-    --fog-color: rgba(20, 30, 40, 0.7);
-
-    --card-bg: rgba(20, 30, 40, 0.55);
-}
-
-/* =========================================
-   4. ОСНОВНИЙ КОНТЕЙНЕР
-========================================= */
+button { cursor: pointer; }
 
 .container {
     position: relative;
     width: 92%;
-    max-width: 1600px; /* 👈 ВИПРАВЛЕНО: прибрано перенос рядка */
-    min-height: 90vh;
-    margin: 30px auto;
-    padding-bottom: 220px;
-    overflow: hidden;
-    border: 2px solid rgba(50, 150, 220, 0.7);
-    border-radius: 8px;
-    background: var(--background);
-    transition: background var(--transition);
-}
-
-/* ... інші базові стилі ... */
-
-
-/* =========================================
-   ТЕСТ ДОЩУ (ВИПРАВЛЕНО: винесено з media-запиту)
-========================================= */
-
-.rain-test-button {
-    position: relative;
-    display: block;
-    margin: 20px auto;
-    z-index: 100;
-    padding: 10px 18px;
-    border: 1px solid var(--button-border);
-    border-radius: 10px;
-    background: var(--button-bg);
-    color: var(--button-text);
-    font-size: 15px;
-    font-family: inherit;
-    cursor: pointer;
-    backdrop-filter: blur(5px);
-    box-shadow: 0 5px 15px var(--shadow-color);
-    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease;
-}
-
-.rain-test-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px var(--shadow-color);
-}
-
-
-/* =========================================
-   ГРАФІК ЧАЮ (ВИПРАВЛЕНО: винесено з media-запиту)
-========================================= */
-
-.tea-chart {
-    position: relative;
-    z-index: 20;
-    width: min(90%, 700px);
+    max-width: 1200px;
+    min-height: 100vh;
     margin: 25px auto;
-    padding: 22px;
-    border-radius: 18px;
-    background: rgba(35, 50, 55, 0.82);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-    color: var(--button-text);
+    padding: 15px 0 150px;
+    overflow: hidden;
+    border: 2px solid rgba(50,150,220,.55);
+    border-radius: 20px;
+    background: var(--background);
 }
-
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
-
-.chart-header h2 {
-    margin: 0;
-    font-size: 20px;
-}
-
-.chart-header p {
-    margin-top: 5px;
-    font-size: 13px;
-    opacity: 0.65;
-}
-
-.chart-total {
-    padding: 8px 12px;
-    border-radius: 10px;
-    background: var(--button-bg);
-    font-weight: bold;
-}
-
-.chart {
-    display: flex;
-    height: 230px;
-    width: 100%;
-}
-
-.chart-y {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 45px;
-    padding-bottom: 25px;
-    font-size: 11px;
-    opacity: 0.6;
-    text-align: right;
-}
-
-.chart-area {
-    position: relative;
-    flex: 1;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-around;
-    gap: 12px;
-    padding: 0 10px 25px 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-    background: repeating-linear-gradient(
-        to top,
-        transparent 0,
-        transparent 44px,
-        rgba(255, 255, 255, 0.08) 45px
-    );
-}
-
-.chart-column {
-    position: relative;
-    height: 100%;
-    flex: 1;
-    max-width: 65px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-}
-
-.chart-bar {
-    position: relative;
-    width: 65%;
-    min-height: 4px;
-    border-radius: 8px 8px 3px 3px;
-    background: linear-gradient(
-        to top,
-        rgba(84, 150, 160, 0.8),
-        rgba(160, 220, 215, 0.95)
-    );
-    box-shadow: 0 5px 15px rgba(100, 200, 200, 0.2);
-    transform-origin: bottom;
-    animation: chartGrow 0.7s ease forwards;
-    transition: filter 0.25s ease, transform 0.25s ease;
-}
-
-.chart-bar:hover {
-    transform: scaleX(1.12);
-    filter: brightness(1.2);
-}
-
-.chart-value {
-    position: absolute;
-    top: -25px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.chart-column:hover .chart-value {
-    opacity: 1;
-}
-
-.chart-day {
-    position: absolute;
-    bottom: -23px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px;
-    opacity: 0.65;
-    white-space: nowrap;
-}
-
-@keyframes chartGrow {
-    from {
-        transform: scaleY(0);
-    }
-    to {
-        transform: scaleY(1);
-    }
-}
-
-/* МЕДІА ЗАПИТИ ДЛЯ АДАПТИВУ */
-
-@media (max-width: 600px) {
-    .tea-chart {
-        width: 94%;
-        padding: 16px;
-    }
-
-    .chart {
-        height: 190px;
-    }
-
-    .chart-area {
-        gap: 5px;
-        padding-left: 8px;
-    }
-
-    .chart-bar {
-        width: 75%;
-    }
-
-    .chart-header h2 {
-        font-size: 17px;
-    }
-
-    .chart-total {
-        font-size: 12px;
-    }
-}
-
-
-/* =========================================
-   5. ФОН
-========================================= */
 
 .background {
-
     position: absolute;
-
     inset: 0;
-
     width: 100%;
-
     height: 100%;
-
+    min-height: 100%;
     object-fit: cover;
-
     z-index: 0;
-
-    transition:
-        filter 0.8s ease,
-        opacity 0.8s ease;
+    pointer-events: none;
+    transition: filter .8s ease;
 }
 
+body.dark .background { filter: brightness(.5); }
 
-/* =========================================
-   6. ЗАГОЛОВОК
-========================================= */
+.header, .weather-card, .cup-volume, .main-button, .statistics,
+.tea-chart, .quests-section {
+    position: relative;
+    z-index: 20;
+}
 
 .header {
-
-    position: relative;
-
-    z-index: 15;
-
     text-align: center;
-
     padding: 15px 20px;
 }
 
 .header h1 {
-
-    font-size:
-        clamp(30px, 5vw, 58px);
-
+    font-size: clamp(30px, 5vw, 58px);
     font-weight: 400;
-
-    transition:
-        color var(--transition);
 }
 
 .header p {
-
-    margin-top: 5px;
-
-    font-size:
-        clamp(16px, 2vw, 20px);
+    margin-top: 7px;
+    font-size: clamp(16px, 2vw, 20px);
 }
-
-
-/* =========================================
-   7. КНОПКА ДЕНЬ / НІЧ
-========================================= */
 
 .theme-button {
-
     position: absolute;
-
     top: 20px;
-
     left: 20px;
-
-    z-index: 30;
-
+    z-index: 50;
     padding: 10px 15px;
-
-    border:
-        1px solid var(--button-border);
-
+    border: 1px solid var(--button-border);
     border-radius: 50px;
-
     background: var(--button-bg);
-
     color: var(--button-text);
-
-    cursor: pointer;
-
-    box-shadow:
-        0 4px 12px var(--shadow-color);
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.4s ease,
-        color 0.4s ease;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: transform .25s ease, box-shadow .25s ease;
 }
 
-.theme-button:hover {
+.theme-button:hover { transform: translateY(-2px); }
 
-    transform:
-        translateY(-2px);
-
-    box-shadow:
-        0 7px 18px var(--shadow-color);
+.weather-card,
+.statistics,
+.tea-chart,
+.quests-section {
+    width: min(92%, 900px);
+    margin: 25px auto;
+    padding: 20px;
+    border: 1px solid var(--button-border);
+    border-radius: 20px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 30px var(--shadow-color);
 }
-
-.theme-button:active {
-
-    transform:
-        translateY(0);
-}
-
-
-/* =========================================
-   8. ПОГОДА
-========================================= */
 
 .weather-card {
-
-    position: relative;
-
-    z-index: 20;
-
-    width: 270px;
-
-    margin: 20px auto 0;
-
-    padding: 18px 20px;
-
-    border:
-        1px solid var(--button-border);
-
-    border-radius: 20px;
-
-    background:
-        var(--card-bg);
-
-    backdrop-filter:
-        blur(12px);
-
-    -webkit-backdrop-filter:
-        blur(12px);
-
-    color: var(--text-color);
-
-    box-shadow:
-        0 8px 30px var(--shadow-color);
-
-    transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
+    width: min(92%, 430px);
+    text-align: center;
 }
 
-.weather-card:hover {
-
-    transform:
-        translateY(-3px);
-
-    box-shadow:
-        0 14px 35px var(--shadow-color);
-}
-
-
-.weather-top {
-
+.weather-top, .chart-header, .quests-header, .tea-level-top {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
-    margin-bottom: 10px;
+    gap: 15px;
 }
 
-.weather-title {
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    opacity: 0.7;
-}
+.weather-title { font-weight: 700; opacity: .75; }
 
 .weather-status {
-
-    font-size: 12px;
-
-    padding: 4px 8px;
-
+    padding: 4px 9px;
     border-radius: 20px;
-
-    background:
-        var(--button-bg);
-
-    color:
-        var(--button-text);
+    background: var(--button-bg);
+    font-size: 12px;
 }
-
 
 .weather-main {
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
-    gap: 15px;
-
-    margin: 5px 0 10px;
+    gap: 18px;
+    margin: 10px 0 15px;
 }
 
-
 .weather-icon {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    width: 65px;
-
-    height: 65px;
-
+    width: 70px;
+    height: 70px;
+    display: grid;
+    place-items: center;
     font-size: 52px;
-
-    filter:
-        drop-shadow(
-            0 5px 8px var(--shadow-color)
-        );
-
-    transition:
-        transform 0.4s ease;
+    transition: transform .4s ease;
 }
 
 .weather-card:hover .weather-icon {
-
-    transform:
-        scale(1.08)
-        rotate(3deg);
+    transform: scale(1.08) rotate(3deg);
 }
 
-
 .weather-temperature {
-
     display: flex;
-
     align-items: flex-start;
-
-    font-size: 48px;
-
+    font-size: 50px;
     font-weight: 300;
-
     line-height: 1;
 }
 
 .weather-temperature small {
-
     margin-top: 3px;
-
     font-size: 18px;
-
-    opacity: 0.7;
+    opacity: .7;
 }
-
 
 .weather-bottom {
-
     display: flex;
-
-    align-items: center;
-
     justify-content: space-between;
-
     gap: 10px;
-
     padding-top: 10px;
-
-    border-top:
-        1px solid
-        rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255,255,255,.2);
 }
 
-.weather-city {
+.weather-city { font-weight: 700; }
+.weather-description { opacity: .7; }
 
-    font-size: 15px;
-
-    font-weight: 600;
+.weather-refresh,
+.weather-buttons button,
+.reset-quests-button,
+.clear-history-button {
+    border: 1px solid var(--button-border);
+    border-radius: 12px;
+    background: var(--button-bg);
+    color: var(--button-text);
+    padding: 9px 13px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: transform .2s ease, filter .2s ease;
 }
 
-.weather-description {
-
-    font-size: 13px;
-
-    opacity: 0.65;
-
-    text-align: right;
+.weather-refresh {
+    margin-top: 15px;
 }
 
+.weather-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 10px;
+}
 
-/* =========================================
-   9. ОБ'ЄМ ЧАШКИ
-========================================= */
+.weather-refresh:hover,
+.weather-buttons button:hover,
+.reset-quests-button:hover,
+.clear-history-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+}
 
 .cup-volume {
-
-    position: relative;
-
-    z-index: 20;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     gap: 8px;
-
-    width: fit-content;
-
-    margin: 25px auto 0;
-
-    color: var(--text-color);
+    margin-top: 25px;
 }
 
 .cup-volume label {
-
     font-size: 18px;
-
-    font-weight: 500;
-}
-
-.volume-input {
-
-    display: flex;
-
-    gap: 6px;
-}
-
-.volume-input input,
-.volume-input select {
-
-    padding: 10px 12px;
-
-    border:
-        1px solid var(--button-border);
-
-    border-radius: 8px;
-
-    background:
-        var(--button-bg);
-
-    color:
-        var(--button-text);
-
-    font-size: 16px;
-
-    font-family: inherit;
-
-    outline: none;
-
-    transition:
-        box-shadow 0.25s ease,
-        transform 0.25s ease;
-}
-
-.volume-input input {
-
-    width: 120px;
-}
-
-.volume-input select {
-
-    width: 70px;
-
-    cursor: pointer;
-}
-
-.volume-input input:hover,
-.volume-input select:hover {
-
-    transform:
-        translateY(-2px);
-
-    box-shadow:
-        0 5px 15px var(--shadow-color);
-}
-
-.volume-input input:focus,
-.volume-input select:focus {
-
-    box-shadow:
-        0 0 0 3px
-        rgba(50, 150, 220, 0.25);
-}
-
-
-/* =========================================
-   10. ГОЛОВНА КНОПКА
-========================================= */
-
-.main-button {
-    position: relative;
-
-    z-index: 20;
-
-    display: block;
-
-    margin: 30px auto 0 auto;
-
-    padding: 20px 35px;
-
-    border: 1px solid var(--button-border);
-
-    border-radius: 25px;
-
-    background: var(--button-bg);
-
-    color: var(--button-text);
-
-    font-size: 20px;
-
-    font-family: inherit;
-
-    cursor: pointer;
-
-    backdrop-filter: blur(8px);
-
-    box-shadow:
-        0 6px 20px rgba(0, 0, 0, 0.15);
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.4s ease,
-        color 0.4s ease;
-}
-
-
-
-
-/* =========================================
-   11. ЧАШКА
-========================================= */
-
-.tea-cup {
-
-    position: absolute;
-
-    left: 50%;
-
-    bottom: 45px;
-
-    transform:
-        translateX(-50%);
-
-    z-index: 18;
-
-    font-size: 120px;
-
-    line-height: 1;
-
-    filter:
-        drop-shadow(
-            0 10px 10px rgba(0, 0, 0, 0.3)
-        );
-
-    animation:
-        cupFloat 3s ease-in-out infinite;
-}
-
-@keyframes cupFloat {
-
-    0% {
-
-        transform:
-            translateX(-50%)
-            translateY(0);
-    }
-
-    50% {
-
-        transform:
-            translateX(-50%)
-            translateY(-8px);
-    }
-
-    100% {
-
-        transform:
-            translateX(-50%)
-            translateY(0);
-    }
-}
-
-
-/* =========================================
-   12. СТАТИСТИКА
-========================================= */
-
-.statistics {
-
-    position: relative;
-
-    z-index: 20;
-
-    width: 90%;
-
-    max-width: 850px;
-
-    margin: 35px auto 0;
-
-    padding: 20px;
-
-    border:
-        1px solid var(--button-border);
-
-    border-radius: 20px;
-
-    background:
-        var(--card-bg);
-
-    backdrop-filter:
-        blur(12px);
-
-    -webkit-backdrop-filter:
-        blur(12px);
-
-    box-shadow:
-        0 8px 30px var(--shadow-color);
-}
-
-.statistics h2 {
-
-    margin-bottom: 18px;
-
-    text-align: center;
-
-    font-size: 24px;
-
-    font-weight: 400;
-}
-
-
-.statistics-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    gap: 15px;
-}
-
-
-.stat-card {
-
-    padding: 18px 10px;
-
-    text-align: center;
-
-    border:
-        1px solid var(--button-border);
-
-    border-radius: 15px;
-
-    background:
-        rgba(255, 255, 255, 0.12);
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.3s ease;
-}
-
-.stat-card:hover {
-
-    transform:
-        translateY(-4px);
-
-    box-shadow:
-        0 8px 20px var(--shadow-color);
-}
-
-
-.stat-icon {
-
-    font-size: 30px;
-
-    margin-bottom: 7px;
-}
-
-
-.stat-title {
-
-    font-size: 14px;
-
-    opacity: 0.7;
-
-    margin-bottom: 8px;
-}
-
-
-.stat-value {
-
-    font-size: 23px;
-
     font-weight: 600;
 }
 
-
-/* =========================================
-   13. ТУМАН
-========================================= */
-
-.fog-top,
-.fog-bottom {
-
-    position: absolute;
-
-    left: 0;
-
-    width: 100%;
-
-    pointer-events: none;
-
-    z-index: 10;
-
-    transition:
-        opacity 0.8s ease;
+.volume-input {
+    display: flex;
+    gap: 7px;
 }
 
-.fog-top {
-
-    top: 0;
-
-    height: 120px;
-
-    background:
-        linear-gradient(
-            to bottom,
-            var(--fog-color),
-            transparent
-        );
-}
-
-.fog-bottom {
-
-    bottom: 0;
-
-    height: 120px;
-
-    background:
-        linear-gradient(
-            to top,
-            var(--fog-color),
-            transparent
-        );
-}
-
-
-/* =========================================
-   14. СНІГ
-========================================= */
-
-.snow {
-
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    z-index: 50;
-
-    overflow: hidden;
-}
-
-.snowflake {
-
-    position: absolute;
-
-    top: -20px;
-
-    color: white;
-
-    font-size: 20px;
-
-    animation:
-        snowfall linear infinite;
-}
-
-@keyframes snowfall {
-
-    from {
-
-        transform:
-            translateY(-20px);
-    }
-
-    to {
-
-        transform:
-            translateY(110vh);
-    }
-}
-
-
-/* =========================================
-   15. ДОЩ
-========================================= */
-
-.rain {
-
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    z-index: 50;
-
-    overflow: hidden;
-}
-
-.raindrop {
-
-    position: absolute;
-
-    top: -30px;
-
-    width: 2px;
-
-    height: 20px;
-
-    background:
-        rgba(255, 255, 255, 0.6);
-
-    animation:
-        rain-fall linear infinite;
-}
-
-@keyframes rain-fall {
-
-    from {
-
-        transform:
-            translateY(-30px);
-    }
-
-    to {
-
-        transform:
-            translateY(110vh);
-    }
-}
-
-
-/* =========================================
-   16. ТЕМНИЙ ФОН
-========================================= */
-
-body.dark .background {
-
-    filter:
-        brightness(0.55);
-}
-
-
-/* =========================================
-   17. ТЕЛЕФОН
-========================================= */
-
-@media (max-width: 768px) {
-
-    .container {
-
-        width: 96%;
-
-        min-height: 95vh;
-
-        margin: 15px auto;
-
-        padding-bottom: 190px;
-    }
-
-    .header h1 {
-
-        font-size:
-            clamp(26px, 8vw, 42px);
-    }
-
-    .main-button {
-
-        font-size: 17px;
-
-        padding:
-            16px 25px;
-    }
-
-    .statistics {
-
-        width: 94%;
-    }
-
-    .statistics-grid {
-
-        grid-template-columns:
-            1fr;
-    }
-
-    .tea-cup {
-
-        font-size: 90px;
-
-        bottom: 35px;
-    }
-}
-
-
-@media (max-width: 480px) {
-
-    .container {
-
-        margin: 10px auto;
-    }
-
-    .weather-card {
-
-        width: 90%;
-    }
-
-    .theme-button {
-
-        top: 15px;
-
-        left: 15px;
-
-        padding:
-            8px 12px;
-    }
-
-    .cup-volume {
-
-        margin-top: 20px;
-    }
-
-    .cup-volume label {
-
-        font-size: 16px;
-    }
-
-    .volume-input input {
-
-        width: 110px;
-    }
-
-    .volume-input input,
-    .volume-input select {
-
-        padding:
-            8px 10px;
-
-        font-size: 15px;
-    }
-
-    .main-button {
-
-        font-size: 16px;
-
-        padding:
-            14px 20px;
-    }
-
-    .statistics h2 {
-
-        font-size: 21px;
-    }
-
-    .stat-value {
-
-        font-size: 21px;
-    }
-    /* =========================================
-   ТЕСТ ДОЩУ
-========================================= */
-
-.rain-test-button {
-    position: absolute;
-
-    left: 50%;
-    top: 550px;
-
-    transform: translateX(-50%);
-
-    z-index: 100;
-
-    padding: 10px 18px;
-
+.volume-input input,
+.volume-input select,
+.custom-forecast-inputs input,
+.custom-forecast-inputs select {
+    padding: 10px 12px;
     border: 1px solid var(--button-border);
     border-radius: 10px;
-
+    outline: none;
     background: var(--button-bg);
     color: var(--button-text);
-
-    font-size: 15px;
-    font-family: inherit;
-
-    cursor: pointer;
-
-    backdrop-filter: blur(5px);
-
-    box-shadow:
-        0 5px 15px var(--shadow-color);
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.3s ease;
 }
 
-.rain-test-button:hover {
-    transform:
-        translateX(-50%)
-        translateY(-3px);
+.volume-input input { width: 120px; }
+.volume-input select { width: 75px; }
 
-    box-shadow:
-        0 10px 25px var(--shadow-color);
-}
-
-.rain-test-button:active {
-    transform:
-        translateX(-50%)
-        translateY(0);
-}
-/* =========================================
-   ГРАФІК ЧАЮ
-========================================= */
-
-.tea-chart {
-    position: relative;
-
-    z-index: 20;
-
-    width: min(90%, 700px);
-
-    margin: 25px auto;
-
-    padding: 22px;
-
-    border-radius: 18px;
-
-    background: rgba(35, 50, 55, 0.82);
-
-    border: 1px solid rgba(255, 255, 255, 0.15);
-
-    backdrop-filter: blur(8px);
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.35);
-
+.main-button {
+    display: block;
+    margin: 28px auto 0;
+    padding: 20px 35px;
+    border: 1px solid var(--button-border);
+    border-radius: 25px;
+    background: var(--button-bg);
     color: var(--button-text);
-}
-
-
-/* Верх графіка */
-
-.chart-header {
-    display: flex;
-
-    justify-content: space-between;
-    align-items: center;
-
-    margin-bottom: 25px;
-}
-
-.chart-header h2 {
-    margin: 0;
-
     font-size: 20px;
+    box-shadow: 0 6px 20px var(--shadow-color);
+    backdrop-filter: blur(8px);
+    transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.chart-header p {
-    margin-top: 5px;
-
-    font-size: 13px;
-
-    opacity: 0.65;
+.main-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px var(--shadow-color);
 }
 
-.chart-total {
-    padding: 8px 12px;
+.main-button:active { transform: scale(.98); }
 
-    border-radius: 10px;
+.tea-added { animation: teaAdded .35s ease; }
 
-    background: var(--button-bg);
-
-    font-weight: bold;
+@keyframes teaAdded {
+    50% { transform: scale(1.05); }
 }
 
-
-/* Область графіка */
-
-.chart {
-    display: flex;
-
-    height: 230px;
-
-    width: 100%;
-}
-
-
-/* Значення зліва */
-
-.chart-y {
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: space-between;
-
-    width: 45px;
-
-    padding-bottom: 25px;
-
-    font-size: 11px;
-
-    opacity: 0.6;
-
-    text-align: right;
-}
-
-
-/* Сам графік */
-
-.chart-area {
+.tea-cup {
     position: relative;
-
-    flex: 1;
-
-    display: flex;
-
-    align-items: flex-end;
-
-    justify-content: space-around;
-
-    gap: 12px;
-
-    padding:
-        0 10px 25px 15px;
-
-    border-bottom: 1px solid
-        rgba(255, 255, 255, 0.25);
-
-    background:
-        repeating-linear-gradient(
-            to top,
-            transparent 0,
-            transparent 44px,
-            rgba(255, 255, 255, 0.08) 45px
-        );
+    z-index: 18;
+    width: max-content;
+    margin: 25px auto 5px;
+    font-size: 100px;
+    line-height: 1;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,.3));
+    animation: cupFloat 3s ease-in-out infinite;
 }
 
-
-/* Один день */
-
-.chart-column {
-    position: relative;
-
-    height: 100%;
-
-    flex: 1;
-
-    max-width: 65px;
-
-    display: flex;
-
-    align-items: flex-end;
-
-    justify-content: center;
+@keyframes cupFloat {
+    50% { transform: translateY(-8px); }
 }
 
-
-/* Стовпчик */
-
-.chart-bar {
-    position: relative;
-
-    width: 65%;
-
-    min-height: 4px;
-
-    border-radius:
-        8px 8px 3px 3px;
-
-    background:
-        linear-gradient(
-            to top,
-            rgba(84, 150, 160, 0.8),
-            rgba(160, 220, 215, 0.95)
-        );
-
-    box-shadow:
-        0 5px 15px
-        rgba(100, 200, 200, 0.2);
-
-    transform-origin: bottom;
-
-    animation:
-        chartGrow 0.7s ease forwards;
-
-    transition:
-        filter 0.25s ease,
-        transform 0.25s ease;
+.statistics h2, .quests-section h2 {
+    text-align: center;
+    margin-bottom: 18px;
+    font-weight: 500;
 }
 
-
-/* Наведение */
-
-.chart-bar:hover {
-    transform:
-        scaleX(1.12);
-
-    filter:
-        brightness(1.2);
-}
-
-
-/* Значение над столбиком */
-
-.chart-value {
-    position: absolute;
-
-    top: -25px;
-
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    font-size: 11px;
-
-    white-space: nowrap;
-
-    opacity: 0;
-
-    transition:
-        opacity 0.2s ease;
-}
-
-.chart-column:hover
-.chart-value {
-    opacity: 1;
-}
-
-
-/* День недели */
-
-.chart-day {
-    position: absolute;
-
-    bottom: -23px;
-
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    font-size: 11px;
-
-    opacity: 0.65;
-
-    white-space: nowrap;
-}
-
-
-/* Анімація */
-
-@keyframes chartGrow {
-
-    from {
-        transform:
-            scaleY(0);
-    }
-
-    to {
-        transform:
-            scaleY(1);
-    }
-
-}
-
-
-/* Телефон */
-
-@media (max-width: 600px) {
-
-    .tea-chart {
-        width: 94%;
-
-        padding: 16px;
-    }
-
-    .chart {
-        height: 190px;
-    }
-
-    .chart-area {
-        gap: 5px;
-
-        padding-left: 8px;
-    }
-
-    .chart-bar {
-        width: 75%;
-    }
-
-    .chart-header h2 {
-        font-size: 17px;
-    }
-
-    .chart-total {
-        font-size: 12px;
-    }
-
-}
-}
-/* Двоколоночна сітка для статистики */
 .stats-two-columns {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
 }
 
-.stats-column {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.stats-column h3 {
+.stats-column h3,
+.custom-forecast-section > h3 {
+    margin-bottom: 12px;
     text-align: center;
-    font-size: 17px;
-    font-weight: 500;
-    opacity: 0.85;
-    margin-bottom: 5px;
 }
 
-/* Адаптивність для смартфонів */
-@media (max-width: 650px) {
-    .stats-two-columns {
-        grid-template-columns: 1fr;
-    }
-}
-/* =========================================
-   КНОПКА ОЧИЩЕННЯ ІСТОРІЇ
-========================================= */
-
-.clear-history-button {
-    display: block;
-    margin: 25px auto 0;
-    padding: 10px 22px;
-
+.stat-card {
+    margin: 10px 0;
+    padding: 17px 10px;
+    text-align: center;
     border: 1px solid var(--button-border);
-    border-radius: 12px;
-
-    background: rgba(220, 50, 50, 0.2);
-    color: var(--text-color);
-
-    font-size: 15px;
-    font-family: inherit;
-
-    cursor: pointer;
-    backdrop-filter: blur(5px);
-
-    transition:
-        transform 0.25s ease,
-        background 0.3s ease,
-        box-shadow 0.25s ease;
+    border-radius: 15px;
+    background: rgba(255,255,255,.12);
+    transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.clear-history-button:hover {
+.stat-card:hover {
     transform: translateY(-3px);
-    background: rgba(220, 50, 50, 0.4);
-    box-shadow: 0 6px 18px var(--shadow-color);
+    box-shadow: 0 8px 20px var(--shadow-color);
 }
 
-.clear-history-button:active {
-    transform: translateY(0);
-}
+.stat-icon { font-size: 30px; margin-bottom: 6px; }
+.stat-title { font-size: 14px; opacity: .7; margin-bottom: 8px; }
+.stat-value { font-size: 23px; font-weight: 700; }
 
-/* =========================================
-   КАЛЬКУЛЯТОР ВЛАСНОГО ПРОГНОЗУ
-========================================= */
-
-.custom-forecast-section {
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.custom-forecast-section h3 {
-    text-align: center;
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 15px;
-    opacity: 0.9;
-}
+.custom-forecast-section { margin-top: 25px; }
 
 .custom-forecast-card {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
     gap: 15px;
-    padding: 20px;
+    padding: 15px;
     border: 1px solid var(--button-border);
     border-radius: 15px;
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(5px);
+    background: rgba(255,255,255,.1);
 }
 
 .custom-forecast-inputs {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
     flex-wrap: wrap;
-}
-
-.custom-forecast-inputs label {
-    font-size: 15px;
-    opacity: 0.9;
-}
-
-.custom-forecast-inputs input,
-.custom-forecast-inputs select {
-    padding: 8px 12px;
-    border: 1px solid var(--button-border);
-    border-radius: 8px;
-    background: var(--button-bg);
-    color: var(--button-text);
-    font-size: 15px;
-    font-family: inherit;
-    outline: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.custom-forecast-inputs input {
-    width: 85px;
-    text-align: center;
-}
-
-.custom-forecast-inputs select {
-    cursor: pointer;
-}
-
-.custom-forecast-inputs input:focus,
-.custom-forecast-inputs select:focus {
-    box-shadow: 0 0 0 2px rgba(50, 150, 220, 0.4);
+    gap: 7px;
 }
 
 .custom-forecast-result {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    margin-top: 5px;
-}
-
-.custom-forecast-result span {
-    font-size: 14px;
-    opacity: 0.75;
+    text-align: center;
 }
 
 .custom-forecast-result strong {
-    font-size: 26px;
-    font-weight: 600;
+    display: block;
+    margin-top: 4px;
+    font-size: 22px;
 }
 
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    margin: 0;
-    padding: 0;
-
-    width: 100%;
-    min-height: 100%;
-
-    font-family: Arial, sans-serif;
-
-    overflow-x: hidden;
-}
-
-
-body {
-    min-height: 100vh;
-
-    display: flex;
-    flex-direction: column;
-
-    background: linear-gradient(
-        180deg,
-        #6ec6ff,
-        #dff6ff
-    );
-}
-
-
-main {
-    flex: 1;
-
-    padding: 40px;
-
-    text-align: center;
-
-    position: relative;
-    z-index: 2;
-}
-
-
-/* ==========* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    margin: 0;
-    padding: 0;
-
-    width: 100%;
-    min-height: 100%;
-
-    font-family: Arial, sans-serif;
-
-    overflow-x: hidden;
-}
-
-body {
-    min-height: 100vh;
-
-    display: flex;
-    flex-direction: column;
-
-    background: linear-gradient(
-        180deg,
-        #6ec6ff,
-        #dff6ff
-    );
-}
-
-main {
-    flex: 1;
-
-    padding: 40px;
-
-    text-align: center;
-
-    position: relative;
-    z-index: 2;
-}
-
-/* =========================================
-   8. ПОГОДА
-========================================= */
-
-.weather-card {
-
-    position: relative;
-
-    z-index: 20;
-
-    width: 270px;
-
+.clear-history-button,
+.reset-quests-button {
+    display: block;
     margin: 20px auto 0;
-
-    padding: 18px 20px;
-
-    border:
-        1px solid var(--button-border);
-
-    border-radius: 20px;
-
-    background:
-        var(--card-bg);
-
-    backdrop-filter:
-        blur(12px);
-
-    -webkit-backdrop-filter:
-        blur(12px);
-
-    color: var(--text-color);
-
-    box-shadow:
-        0 8px 30px var(--shadow-color);
-
-    transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
 }
 
-.weather-card:hover {
+.tea-chart { overflow: hidden; }
 
-    transform:
-        translateY(-3px);
+.chart-header h2 { margin: 0; font-size: 20px; }
+.chart-header p { margin-top: 5px; opacity: .65; font-size: 13px; }
 
-    box-shadow:
-        0 14px 35px var(--shadow-color);
+.chart-total {
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: var(--button-bg);
+    font-weight: 700;
 }
 
-
-.weather-top {
-
+.chart {
     display: flex;
+    width: 100%;
+    height: 250px;
+    margin-top: 15px;
+}
 
-    align-items: center;
-
+.chart-y {
+    display: flex;
+    flex-direction: column;
     justify-content: space-between;
-
-    margin-bottom: 10px;
-}
-
-.weather-title {
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    opacity: 0.7;
-}
-
-.weather-status {
-
-    font-size: 12px;
-
-    padding: 4px 8px;
-
-    border-radius: 20px;
-
-    background:
-        var(--button-bg);
-
-    color:
-        var(--button-text);
-}
-
-
-.weather-main {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 15px;
-
-    margin: 5px 0 10px;
-}
-
-
-.weather-icon {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    width: 65px;
-
-    height: 65px;
-
-    font-size: 52px;
-
-    filter:
-        drop-shadow(
-            0 5px 8px var(--shadow-color)
-        );
-
-    transition:
-        transform 0.4s ease;
-}
-
-.weather-card:hover .weather-icon {
-
-    transform:
-        scale(1.08)
-        rotate(3deg);
-}
-
-
-.weather-temperature {
-
-    display: flex;
-
-    align-items: flex-start;
-
-    font-size: 48px;
-
-    font-weight: 300;
-
-    line-height: 1;
-}
-
-.weather-temperature small {
-
-    margin-top: 3px;
-
-    font-size: 18px;
-
-    opacity: 0.7;
-}
-
-
-.weather-bottom {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 10px;
-
-    padding-top: 10px;
-
-    border-top:
-        1px solid
-        rgba(255, 255, 255, 0.2);
-}
-
-.weather-city {
-
-    font-size: 15px;
-
-    font-weight: 600;
-}
-
-.weather-description {
-
-    font-size: 13px;
-
-    opacity: 0.65;
-
+    width: 45px;
+    padding-bottom: 25px;
+    font-size: 11px;
+    opacity: .6;
     text-align: right;
 }
 
-
-
-/* =================================
-   БЛОК ПОГОДИ
-================================= */
-
-.weather {
-
-    width: calc(100% - 30px);
-
-    margin: 15px;
-
-    padding: 20px 15px 25px;
-
-    text-align: center;
-
+.chart-area {
     position: relative;
-
-    z-index: 20;
-
-    /* Заокруглення ВСІХ кутів */
-    border-radius: 30px;
-
-    background: rgba(255, 255, 255, 0.78);
-
-    backdrop-filter: blur(12px);
-
-    -webkit-backdrop-filter: blur(12px);
-
-    box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.18);
-}
-
-
-/* =================================
-   ЗНАЧОК
-================================= */
-
-.weather-icon {
-
-    width: 85px;
-    height: 85px;
-
-    margin: 0 auto 7px;
-
+    flex: 1;
     display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    font-size: 55px;
-
-    border-radius: 50%;
-
-    background: rgba(255, 255, 255, 0.7);
-
-    box-shadow:
-        0 5px 15px rgba(0, 0, 0, 0.12);
+    align-items: flex-end;
+    justify-content: space-around;
+    gap: 10px;
+    padding: 0 10px 25px 15px;
+    border-bottom: 1px solid rgba(255,255,255,.25);
+    background: repeating-linear-gradient(
+        to top,
+        transparent 0,
+        transparent 44px,
+        rgba(255,255,255,.08) 45px
+    );
 }
 
-
-/* =================================
-   НАЗВА ПОГОДИ
-================================= */
-
-.weather-type {
-
-    font-size: 23px;
-
-    font-weight: bold;
-
-    margin-top: 5px;
-}
-
-
-/* =================================
-   ТЕМПЕРАТУРА
-================================= */
-
-.temperature {
-
-    font-size: 34px;
-
-    font-weight: bold;
-
-    margin: 5px 0 16px;
-}
-
-
-/* =================================
-   КНОПКИ
-================================= */
-
-.weather-buttons {
-
+.chart-column {
+    position: relative;
+    height: 100%;
+    flex: 1;
+    max-width: 70px;
     display: flex;
-
+    align-items: flex-end;
     justify-content: center;
+}
 
+.chart-bar {
+    position: relative;
+    width: 65%;
+    min-height: 3px;
+    border-radius: 8px 8px 3px 3px;
+    background: linear-gradient(to top, rgba(84,150,160,.8), rgba(160,220,215,.95));
+    box-shadow: 0 5px 15px rgba(100,200,200,.2);
+    transform-origin: bottom;
+    animation: chartGrow .6s ease forwards;
+}
+
+@keyframes chartGrow {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+}
+
+.chart-value {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+}
+
+.chart-column:hover .chart-value { opacity: 1; }
+
+.chart-day {
+    position: absolute;
+    bottom: -23px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    opacity: .65;
+    white-space: nowrap;
+}
+
+.quests-header {
+    margin-bottom: 15px;
+}
+
+.quests-header h2 {
+    text-align: left;
+    margin-bottom: 4px;
+}
+
+.quests-header p { opacity: .7; }
+
+.quests-counter {
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: var(--button-bg);
+    font-weight: 700;
+}
+
+.tea-level {
+    padding: 15px;
+    border: 1px solid var(--button-border);
+    border-radius: 16px;
+    background: rgba(255,255,255,.1);
+}
+
+.tea-level-info {
+    display: flex;
     align-items: center;
-
-    flex-wrap: wrap;
-
-    gap: 8px;
+    gap: 10px;
 }
 
-.weather-buttons button,
-.rain-test {
+.tea-level-icon { font-size: 32px; }
+.tea-level-name { font-weight: 700; }
+.tea-level-title { opacity: .7; font-size: 13px; margin-top: 2px; }
 
-    border: none;
+.tea-xp { font-size: 13px; font-weight: 700; }
 
-    border-radius: 18px;
-
-    padding: 11px 18px;
-
-    font-size: 15px;
-
-    cursor: pointer;
-
-    color: white;
-
-    background: #3498db;
-
-    transition:
-        transform 0.2s,
-        background 0.2s,
-        box-shadow 0.2s;
+.tea-xp-bar {
+    height: 10px;
+    margin-top: 12px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: rgba(0,0,0,.2);
 }
 
-.weather-buttons button:hover,
-.rain-test:hover {
-
-    transform: translateY(-2px);
-
-    background: #217dbb;
-
-    box-shadow:
-        0 5px 12px rgba(0, 0, 0, 0.15);
+.tea-xp-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #5db6d4, #8be0bd);
+    transition: width .4s ease;
 }
 
-.weather-buttons button:active,
-.rain-test:active {
+.quests-list { margin-top: 18px; }
 
-    transform: scale(0.95);
+.quest-level-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 18px 0 9px;
 }
 
-
-/* ТЕСТ ДОЩУ */
-
-.rain-test {
-
-    margin-top: 10px;
-
-    background: #1769aa;
+.quest-level-title h2 {
+    margin: 0;
+    text-align: left;
+    font-size: 20px;
 }
 
+.quest-level-title span {
+    font-size: 13px;
+    opacity: .7;
+}
 
-/* =================================
-   ЕФЕКТИ НА ВСЬОМУ ЕКРАНІ
-================================= */
+.quest {
+    position: relative;
+    display: grid;
+    grid-template-columns: 55px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    margin: 9px 0;
+    padding: 13px;
+    border: 1px solid var(--button-border);
+    border-radius: 15px;
+    background: rgba(255,255,255,.1);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
 
-#weatherEffect {
+.quest:hover { transform: translateY(-2px); box-shadow: 0 7px 18px var(--shadow-color); }
 
+.quest.locked { opacity: .55; }
+.quest.completed { border-color: rgba(100,220,150,.6); }
+
+.quest-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+    background: var(--button-bg);
+    font-size: 27px;
+}
+
+.quest-content h3 { margin-bottom: 4px; }
+.quest-content p { font-size: 13px; opacity: .7; }
+
+.quest-progress { margin-top: 9px; }
+
+.quest-progress-bar {
+    height: 7px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: rgba(0,0,0,.2);
+}
+
+.quest-progress-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #5db6d4, #8be0bd);
+}
+
+.quest-progress-text {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    opacity: .75;
+}
+
+.quest-reward {
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.quest-completed { font-size: 22px; }
+
+.quest-notification {
     position: fixed;
-
-    inset: 0;
-
-    width: 100vw;
-    height: 100vh;
-
+    right: 22px;
+    bottom: 22px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 330px;
+    padding: 15px 18px;
+    border: 1px solid var(--button-border);
+    border-radius: 16px;
+    background: var(--button-bg);
+    color: var(--button-text);
+    box-shadow: 0 10px 30px var(--shadow-color);
+    backdrop-filter: blur(10px);
+    transform: translateY(150%);
+    opacity: 0;
     pointer-events: none;
+    transition: transform .35s ease, opacity .35s ease;
+}
 
-    z-index: 5;
+.quest-notification.show {
+    transform: translateY(0);
+    opacity: 1;
+}
 
+.quest-notification-icon { font-size: 30px; }
+
+.quest-notification strong,
+.quest-notification span {
+    display: block;
+}
+
+.quest-notification span {
+    margin-top: 4px;
+    font-size: 13px;
+    opacity: .75;
+}
+
+/* Погодні ефекти */
+#weatherEffect {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
     overflow: hidden;
 }
 
-
-/* =================================
-   ДОЩ
-================================= */
-
 .rain-drop {
-
     position: absolute;
-
-    top: -50px;
-
+    top: -30px;
     width: 2px;
-    height: 30px;
-
-    border-radius: 50%;
-
-    background: #258dcc;
-
-    opacity: 0.75;
-
+    height: 22px;
+    background: rgba(255,255,255,.7);
     animation: rainFall linear forwards;
 }
 
 @keyframes rainFall {
-
-    from {
-        transform: translateY(0);
-    }
-
-    to {
-        transform: translateY(115vh);
-        opacity: 0;
-    }
+    to { transform: translateY(110vh); }
 }
 
-
-/* =================================
-   СНІГ
-================================= */
-
 .snowflake {
-
     position: absolute;
-
-    top: -50px;
-
+    top: -30px;
     color: white;
-
-    font-size: 22px;
-
-    filter:
-        drop-shadow(0 0 4px #999);
-
+    text-shadow: 0 0 5px rgba(0,0,0,.2);
     animation: snowFall linear forwards;
 }
 
 @keyframes snowFall {
-
-    0% {
-        transform:
-            translateY(0)
-            translateX(0)
-            rotate(0deg);
-    }
-
-    50% {
-        transform:
-            translateY(55vh)
-            translateX(30px)
-            rotate(180deg);
-    }
-
-    100% {
-        transform:
-            translateY(115vh)
-            translateX(-30px)
-            rotate(360deg);
-    }
+    to { transform: translateY(110vh) rotate(360deg); }
 }
 
-
-/* =================================
-   ГРОЗА
-================================= */
-
 .lightning {
-
-    position: fixed;
-
+    position: absolute;
     inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    background:
-        rgba(255, 255, 255, 0.9);
-
-    pointer-events: none;
-
-    animation: lightningFlash 0.5s;
-
+    background: rgba(255,255,255,.85);
+    animation: lightningFlash .45s ease-out forwards;
 }
 
 @keyframes lightningFlash {
-
-    0% {
-        opacity: 0;
-    }
-
-    10% {
-        opacity: 1;
-    }
-
-    25% {
-        opacity: 0;
-    }
-
-    45% {
-        opacity: 0.9;
-    }
-
-    100% {
-        opacity: 0;
-    }
+    0%, 100% { opacity: 0; }
+    15%, 35% { opacity: 1; }
+    55% { opacity: .1; }
 }
 
-
-/* =================================
-   ТУМАН
-================================= */
-
-.fog {
-
-    position: fixed;
-
+.weather-fog {
+    position: absolute;
     inset: -20%;
-
-    width: 140%;
-    height: 140%;
-
-    background:
-        rgba(220, 225, 230, 0.5);
-
-    filter: blur(25px);
-
-    animation:
-        fogMove 7s ease-in-out infinite alternate;
-
+    background: radial-gradient(ellipse at center, rgba(255,255,255,.45), rgba(255,255,255,.05) 55%, transparent 70%);
+    filter: blur(15px);
+    animation: fogMove 8s ease-in-out infinite alternate;
 }
 
 @keyframes fogMove {
-
-    from {
-        transform: translateX(-7%);
-    }
-
-    to {
-        transform: translateX(7%);
-    }
-    
-}
-/* =========================================
-   КВЕСТИ
-========================================= */
-
-.quests-section {
-
-    margin-top: 30px;
-    padding: 25px;
-
-    border-radius: 20px;
-
-    background: rgba(255, 255, 255, 0.75);
-
-    backdrop-filter: blur(10px);
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.08);
-
-    transition: 0.3s;
+    to { transform: translateX(7%) scale(1.08); }
 }
 
-
-/* Темна тема */
-
-body.dark .quests-section {
-
-    background: rgba(30, 35, 32, 0.85);
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.25);
-}
-
-
-/* =========================================
-   ЗАГОЛОВОК
-========================================= */
-
-.quests-header {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    margin-bottom: 20px;
-}
-
-
-.quests-header h2 {
-
-    margin: 0;
-
-    font-size: 28px;
-}
-
-
-.quests-header p {
-
-    margin: 5px 0 0;
-
-    opacity: 0.65;
-
-    font-size: 14px;
-}
-
-
-/* =========================================
-   ЛІЧИЛЬНИК
-========================================= */
-
-.quests-counter {
-
-    font-size: 20px;
-
-    font-weight: bold;
-
-    padding: 10px 16px;
-
-    border-radius: 12px;
-
-    background: rgba(80, 140, 90, 0.12);
-}
-
-
-/* =========================================
-   СПИСОК
-========================================= */
-
-.quests-list {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(280px, 1fr));
-
-    gap: 15px;
-}
-
-
-/* =========================================
-   КВЕСТ
-========================================= */
-
-.quest-card {
-
-    position: relative;
-
-    padding: 20px;
-
-    border-radius: 16px;
-
-    background: rgba(255, 255, 255, 0.65);
-
-    border: 1px solid rgba(0, 0, 0, 0.06);
-
-    transition:
-        transform 0.2s,
-        box-shadow 0.2s,
-        opacity 0.3s;
-}
-
-
-body.dark .quest-card {
-
-    background: rgba(255, 255, 255, 0.06);
-
-    border-color:
-        rgba(255, 255, 255, 0.08);
-}
-
-
-.quest-card:hover {
-
-    transform: translateY(-3px);
-
-    box-shadow:
-        0 8px 20px rgba(0, 0, 0, 0.08);
-}
-
-
-/* =========================================
-   ІКОНКА
-========================================= */
-
-.quest-icon {
-
-    font-size: 35px;
-
-    margin-bottom: 8px;
-}
-
-
-/* =========================================
-   НАЗВА
-========================================= */
-
-.quest-title {
-
-    font-size: 19px;
-
-    font-weight: bold;
-
-    margin-bottom: 5px;
-}
-
-
-.quest-description {
-
-    font-size: 14px;
-
-    opacity: 0.65;
-
-    margin-bottom: 15px;
-}
-
-
-/* =========================================
-   ПРОГРЕС
-========================================= */
-
-.quest-progress-text {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    font-size: 13px;
-
-    margin-bottom: 6px;
-}
-
-
-.quest-progress {
-
-    width: 100%;
-
-    height: 8px;
-
-    border-radius: 10px;
-
-    background: rgba(0, 0, 0, 0.08);
-
-    overflow: hidden;
-}
-
-
-body.dark .quest-progress {
-
-    background: rgba(255, 255, 255, 0.1);
-}
-
-
-.quest-progress-bar {
-
-    height: 100%;
-
-    width: 0%;
-
-    border-radius: 10px;
-
-    transition:
-        width 0.5s ease;
-}
-
-
-/* =========================================
-   НАГОРОДА
-========================================= */
-
-.quest-reward {
-
-    margin-top: 12px;
-
-    font-size: 13px;
-
-    opacity: 0.75;
-}
-
-
-/* =========================================
-   ВИКОНАНИЙ КВЕСТ
-========================================= */
-
-.quest-card.completed {
-
-    opacity: 0.7;
-}
-
-
-.quest-card.completed::after {
-
-    content: "✓";
-
+.fog-top, .fog-bottom {
     position: absolute;
-
-    top: 15px;
-
-    right: 15px;
-
-    width: 30px;
-
-    height: 30px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 50%;
-
-    background: rgba(70, 160, 90, 0.2);
-
-    font-size: 18px;
-
-    font-weight: bold;
-}
-
-
-.quest-card.completed
-.quest-progress-bar {
-
-    width: 100% !important;
-}
-
-
-/* =========================================
-   ПОВІДОМЛЕННЯ
-========================================= */
-
-.quest-notification {
-
-    position: fixed;
-
-    right: 25px;
-
-    bottom: 25px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    padding: 15px 20px;
-
-    border-radius: 15px;
-
-    background: white;
-
-    box-shadow:
-        0 10px 35px rgba(0, 0, 0, 0.2);
-
-    transform:
-        translateX(130%);
-
-    opacity: 0;
-
-    transition:
-        transform 0.4s ease,
-        opacity 0.4s ease;
-
-    z-index: 9999;
-}
-
-
-body.dark .quest-notification {
-
-    background: #202522;
-
-    color: white;
-}
-
-
-.quest-notification.show {
-
-    transform:
-        translateX(0);
-
-    opacity: 1;
-}
-
-
-.quest-notification-icon {
-
-    font-size: 32px;
-}
-
-
-.quest-notification strong {
-
-    display: block;
-
-    margin-bottom: 3px;
-}
-
-
-.quest-notification span {
-
-    font-size: 13px;
-
-    opacity: 0.7;
-}
-
-
-/* =========================================
-   MOBILE
-========================================= */
-
-@media (max-width: 600px) {
-
-    .quests-section {
-
-        padding: 18px;
-    }
-
-
-    .quests-header h2 {
-
-        font-size: 23px;
-    }
-
-
-    .quests-list {
-
-        grid-template-columns: 1fr;
-    }
-
-
-    .quest-notification {
-
-        left: 15px;
-
-        right: 15px;
-
-        bottom: 15px;
-    }
-
-}
-/* =========================================
-   ⭐ РІВЕНЬ ГРАВЦЯ
-========================================= */
-
-.tea-level {
-
-    margin-bottom: 25px;
-
-    padding: 18px 20px;
-
-    border-radius: 16px;
-
-    background: rgba(80, 140, 90, 0.10);
-
-    border: 1px solid
-        rgba(80, 140, 90, 0.15);
-
-}
-
-
-/* Верхня частина */
-
-.tea-level-top {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    gap: 15px;
-
-    margin-bottom: 12px;
-}
-
-
-/* Інформація про рівень */
-
-.tea-level-info {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-}
-
-
-/* Іконка */
-
-.tea-level-icon {
-
-    width: 45px;
-
-    height: 45px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 12px;
-
-    background: rgba(255, 255, 255, 0.7);
-
-    font-size: 25px;
-}
-
-
-body.dark .tea-level-icon {
-
-    background:
-        rgba(255, 255, 255, 0.08);
-}
-
-
-/* Назва рівня */
-
-.tea-level-name {
-
-    font-size: 19px;
-
-    font-weight: bold;
-}
-
-
-/* Титул */
-
-.tea-level-title {
-
-    margin-top: 2px;
-
-    font-size: 13px;
-
-    opacity: 0.65;
-}
-
-
-/* XP */
-
-.tea-xp {
-
-    font-size: 14px;
-
-    font-weight: bold;
-
-    white-space: nowrap;
-}
-
-
-/* =========================================
-   XP BAR
-========================================= */
-
-.tea-xp-bar {
-
+    left: 0;
     width: 100%;
-
-    height: 10px;
-
-    border-radius: 20px;
-
-    overflow: hidden;
-
-    background:
-        rgba(0, 0, 0, 0.08);
+    height: 120px;
+    z-index: 10;
+    pointer-events: none;
 }
 
-
-body.dark .tea-xp-bar {
-
-    background:
-        rgba(255, 255, 255, 0.10);
+.fog-top {
+    top: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,.55), transparent);
 }
 
-
-.tea-xp-fill {
-
-    width: 0%;
-
-    height: 100%;
-
-    border-radius: 20px;
-
-    transition:
-        width 0.6s ease;
+.fog-bottom {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(255,255,255,.55), transparent);
 }
 
-
-/* =========================================
-   АНІМАЦІЯ ПІДВИЩЕННЯ РІВНЯ
-========================================= */
-
-@keyframes levelUp {
-
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.04);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-
+body.dark .fog-top,
+body.dark .fog-bottom {
+    opacity: .45;
 }
 
-
-.tea-level.level-up {
-
-    animation:
-        levelUp 0.6s ease;
+@media (max-width: 700px) {
+    .container { width: 96%; margin: 10px auto; border-radius: 15px; }
+    .theme-button { top: 12px; left: 12px; }
+    .stats-two-columns { grid-template-columns: 1fr; }
+    .custom-forecast-card { flex-direction: column; }
+    .weather-bottom { flex-direction: column; align-items: center; }
+    .chart-header { align-items: flex-start; }
+    .chart-header h2 { font-size: 17px; }
+    .quest { grid-template-columns: 45px 1fr; }
+    .quest-reward { grid-column: 2; }
+    .quest-icon { width: 42px; height: 42px; }
+    .tea-level-top { align-items: flex-start; }
+    .tea-xp { white-space: nowrap; }
 }
 
-
-/* MOBILE */
-
-@media (max-width: 600px) {
-
-    .tea-level-top {
-
-        align-items: flex-start;
-
-        flex-direction: column;
-    }
-
-    .tea-xp {
-
-        align-self: flex-end;
-    }
-
+@media (max-width: 430px) {
+    .header h1 { font-size: 28px; }
+    .main-button { width: 90%; padding: 16px 12px; font-size: 17px; }
+    .weather-buttons button { flex: 1 1 45%; }
+    .chart { height: 210px; }
 }

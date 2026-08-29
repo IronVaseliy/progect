@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tea Time</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="container">
+    <img class="background" src="123.png" alt="">
+
+    <div class="fog-top"></div>
+
+    <header class="header">
+        <h1>Скільки ви випили чаю?</h1>
+        <p>Дізнайтесь це на нашому сайті ☕</p>
+    </header>
+
+    <button class="theme-button" id="themeButton" type="button" title="День / ніч">☀️</button>
+
+    <!-- <section class="weather-card">
+        <div class="weather-top">
+            <span class="weather-title">Погода зараз</span>
+            <span class="weather-status" id="weatherStatus">Завантаження</span>
+        </div>
+
+        <div class="weather-main">
+            <div class="weather-icon" id="weatherIcon">🌤️</div>
+            <div class="weather-temperature">
+                <span id="weatherTemperature">--</span><small>°C</small>
+            </div>
+        </div>
+
+        <div class="weather-bottom">
+            <span class="weather-city" id="weatherCity">Визначення міста...</span>
+            <span class="weather-description" id="weatherText">Отримання погоди</span>
+        </div>
+
+        <button class="weather-refresh" id="weatherRefresh" type="button">🔄 Оновити погоду</button>
+
+        <div class="weather-buttons">
+            <button type="button" data-weather="rain">🌧️ Дощ</button>
+            <button type="button" data-weather="snow">❄️ Сніг</button>
+            <button type="button" data-weather="storm">⛈️ Гроза</button>
+            <button type="button" data-weather="fog">🌫️ Туман</button>
+        </div>
+    </section> -->
+
+    <div class="cup-volume">
+        <label for="cupVolume">Об'єм чашки:</label>
+        <div class="volume-input">
+            <input type="number" id="cupVolume" min="1" max="1000" step="1" value="250">
+            <select id="volumeUnit">
+                <option value="ml">мл</option>
+                <option value="l">л</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="main-button" id="teaButton" type="button">
+        Випито чаю за день:
+        <span id="teaCount">0 мл</span>
+    </button>
+
+    <div class="tea-cup">☕</div>
+
+    <section class="statistics">
+        <h2>Статистика споживання чаю</h2>
+
+        <div class="stats-two-columns">
+            <div class="stats-column">
+                <h3>Фактично випито</h3>
+                <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-title">За місяць</div><div class="stat-value" id="monthStat">0 мл</div></div>
+                <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-title">За 6 місяців</div><div class="stat-value" id="sixMonthsStat">0 мл</div></div>
+                <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-title">За рік</div><div class="stat-value" id="yearStat">0 мл</div></div>
+            </div>
+
+            <div class="stats-column">
+                <h3>Орієнтовно буде випито</h3>
+                <div class="stat-card"><div class="stat-icon">🔮</div><div class="stat-title">За місяць</div><div class="stat-value" id="forecastMonthStat">0 мл</div></div>
+                <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-title">За 6 місяців</div><div class="stat-value" id="forecast6MonthsStat">0 мл</div></div>
+                <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-title">За рік</div><div class="stat-value" id="forecastYearStat">0 мл</div></div>
+            </div>
+        </div>
+
+        <div class="custom-forecast-section">
+            <h3>Калькулятор прогнозу споживання</h3>
+            <div class="custom-forecast-card">
+                <div class="custom-forecast-inputs">
+                    <label for="customPeriodInput">Обрати період:</label>
+                    <input type="number" id="customPeriodInput" min="1" max="365" value="7">
+                    <select id="customPeriodUnit">
+                        <option value="days">днів</option>
+                        <option value="months">місяців</option>
+                    </select>
+                </div>
+                <div class="custom-forecast-result">
+                    <span>Орієнтовно вип'єте:</span>
+                    <strong id="customForecastValue">0 мл</strong>
+                </div>
+            </div>
+        </div>
+
+        <button class="clear-history-button" id="clearHistoryButton" type="button">🗑️ Очистити історію</button>
+    </section>
+
+    <section class="tea-chart">
+        <div class="chart-header">
+            <div>
+                <h2>Випито за останні 7 днів</h2>
+                <p>Статистика споживання чаю</p>
+            </div>
+            <span class="chart-total" id="chartTotal">0 мл</span>
+        </div>
+        <div class="chart">
+            <div class="chart-y">
+                <span>2 л</span><span>1.5 л</span><span>1 л</span><span>500 мл</span><span>0</span>
+            </div>
+            <div class="chart-area" id="chartArea"></div>
+        </div>
+    </section>
+
+  <section class="weather-card">
+        <div class="weather-top">
+            <span class="weather-title">Погода зараз</span>
+            <span class="weather-status" id="weatherStatus">Завантаження</span>
+        </div>
+
+        <div class="weather-main">
+            <div class="weather-icon" id="weatherIcon">🌤️</div>
+            <div class="weather-temperature">
+                <span id="weatherTemperature">--</span><small>°C</small>
+            </div>
+        </div>
+
+        <div class="weather-bottom">
+            <span class="weather-city" id="weatherCity">Визначення міста...</span>
+            <span class="weather-description" id="weatherText">Отримання погоди</span>
+        </div>
+
+        <button class="weather-refresh" id="weatherRefresh" type="button">🔄 Оновити погоду</button>
+
+        <div class="weather-buttons">
+            <button type="button" data-weather="rain">🌧️ Дощ</button>
+            <button type="button" data-weather="snow">❄️ Сніг</button>
+            <button type="button" data-weather="storm">⛈️ Гроза</button>
+            <button type="button" data-weather="fog">🌫️ Туман</button>
+        </div>
+    </section> 
+
+
+    <section class="quests-section">
+        <div class="quests-header">
+            <div>
+                <h2>🏆 Квести</h2>
+                <p>Виконуй завдання та отримуй нагороди</p>
+            </div>
+            <div class="quests-counter"><span id="questsCompleted">0</span>/<span id="questsTotal">9</span></div>
+        </div>
+
+        <div class="tea-level">
+            <div class="tea-level-top">
+                <div class="tea-level-info">
+                    <div class="tea-level-icon">⭐</div>
+                    <div>
+                        <div class="tea-level-name">Рівень <span id="teaLevel">1</span></div>
+                        <div class="tea-level-title" id="teaLevelTitle">Новачок</div>
+                    </div>
+                </div>
+                <div class="tea-xp"><span id="teaXP">0</span>/<span id="teaXPNeeded">100</span> XP</div>
+            </div>
+            <div class="tea-xp-bar"><div id="teaXPBar" class="tea-xp-fill"></div></div>
+        </div>
+
+        <div id="questsList" class="quests-list"></div>
+
+        <button class="reset-quests-button" id="resetQuestsButton" type="button">🔄 Скинути квести</button>
+
+        <div id="questNotification" class="quest-notification">
+            <div class="quest-notification-icon">🏆</div>
+            <div>
+                <strong id="questNotificationTitle">Квест виконано!</strong>
+                <span id="questNotificationText">Ти отримав нагороду!</span>
+            </div>
+        </div>
+    </section>
+
+    <div id="weatherEffect"></div>
+    <div class="fog-bottom"></div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

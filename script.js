@@ -1,966 +1,484 @@
-/* =========================================
-   НАСТРОЙКИ
-========================================= */
+"use strict";
 
-const themeButton =
-    document.getElementById("themeButton");
+const $ = (id) => document.getElementById(id);
 
-const teaButton =
-    document.getElementById("teaButton");
+const themeButton = $("themeButton");
+const teaButton = $("teaButton");
+const teaCount = $("teaCount");
+const cupVolume = $("cupVolume");
+const volumeUnit = $("volumeUnit");
 
-const teaCount =
-    document.getElementById("teaCount");
+const monthStat = $("monthStat");
+const sixMonthsStat = $("sixMonthsStat");
+const yearStat = $("yearStat");
+const forecastMonthStat = $("forecastMonthStat");
+const forecast6MonthsStat = $("forecast6MonthsStat");
+const forecastYearStat = $("forecastYearStat");
 
-const weatherIcon =
-    document.getElementById("weatherIcon");
+const customPeriodInput = $("customPeriodInput");
+const customPeriodUnit = $("customPeriodUnit");
+const customForecastValue = $("customForecastValue");
 
-const weatherText =
-    document.getElementById("weatherText");
+const chartArea = $("chartArea");
+const chartTotal = $("chartTotal");
 
-const weatherStatus =
-    document.getElementById("weatherStatus");
+const weatherIcon = $("weatherIcon");
+const weatherType = $("weatherStatus");
+const weatherTemperature = $("weatherTemperature");
+const weatherCity = $("weatherCity");
+const weatherText = $("weatherText");
+const weatherEffect = $("weatherEffect");
+const weatherRefresh = $("weatherRefresh");
 
-const weatherTemperature =
-    document.getElementById("weatherTemperature");
-
-const weatherCity =
-    document.getElementById("weatherCity");
-
-const snowContainer =
-    document.getElementById("snow");
-
-const rainContainer =
-    document.getElementById("rain");
-
-const cupVolume =
-    document.getElementById("cupVolume");
-
-const volumeUnit =
-    document.getElementById("volumeUnit");
+const QUEST_STORAGE_KEY = "teaQuestProgress";
+const XP_STORAGE_KEY = "teaXP";
+const LEVEL_STORAGE_KEY = "teaLevel";
 
 
-/* Статистика */
+// ===============================
+// ДОПОМІЖНІ ФУНКЦІЇ
+// ===============================
 
-const monthStat =
-    document.getElementById("monthStat");
+function formatVolume(ml) {
+    ml = Number(ml) || 0;
 
-const sixMonthsStat =
-    document.getElementById("sixMonthsStat");
+    if (ml >= 1000) {
+        return `${(ml / 1000).toFixed(2).replace(/\.00$/, "")} л`;
+    }
 
-const yearStat =
-    document.getElementById("yearStat");
+    return `${Math.round(ml)} мл`;
+}
 
-/* Калькулятор власного прогнозу */
-const customPeriodInput = document.getElementById("customPeriodInput");
-const customPeriodUnit = document.getElementById("customPeriodUnit");
-const customForecastValue = document.getElementById("customForecastValue");    
+function getDateKey(date = new Date()) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
 
-/* =========================================
-   1. ТЕМА ДЕНЬ / НІЧ
-========================================= */
+    return `${y}-${m}-${d}`;
+}
+
+
+// ===============================
+// ІСТОРІЯ ЧАЮ
+// ===============================
+
+function readHistory() {
+    try {
+        const data = JSON.parse(
+            localStorage.getItem("teaHistory") || "[]"
+        );
+
+        return Array.isArray(data) ? data : [];
+
+    } catch {
+        return [];
+    }
+}
+
+let teaHistory = readHistory();
+
+function saveHistory() {
+    localStorage.setItem(
+        "teaHistory",
+        JSON.stringify(teaHistory)
+    );
+}
+
+
+// ===============================
+// ТЕМА
+// ===============================
+
+function loadTheme() {
+    const dark =
+        localStorage.getItem("teaDarkMode") === "1";
+
+    document.body.classList.toggle("dark", dark);
+
+    themeButton.textContent =
+        dark ? "🌙" : "☀️";
+}
 
 themeButton.addEventListener("click", () => {
 
     document.body.classList.toggle("dark");
 
-    const isDark =
+    const dark =
         document.body.classList.contains("dark");
 
-    if (isDark) {
+    localStorage.setItem(
+        "teaDarkMode",
+        dark ? "1" : "0"
+    );
 
-        themeButton.textContent = "🌙";
+    themeButton.textContent =
+        dark ? "🌙" : "☀️";
+});
+
+loadTheme();
+
+
+// ===============================
+// ОБ'ЄМ ЧАШКИ
+// ===============================
+
+function updateCupLimit() {
+
+    if (volumeUnit.value === "l") {
+
+        cupVolume.max = "1";
+
+        if (Number(cupVolume.value) > 1) {
+            cupVolume.value = "1";
+        }
 
     } else {
 
-        themeButton.textContent = "☀️";
+        cupVolume.max = "1000";
 
-    }
-
-});
-
-
-/* =========================================
-   2. ФОРМАТ ОБ'ЄМУ
-========================================= */
-
-function formatVolume(ml) {
-
-    if (ml >= 1000) {
-
-        return `${(ml / 1000).toFixed(2)} л`;
-
-    }
-
-    return `${Math.round(ml)} мл`;
-}
-/* =========================================
-   ДАТА
-========================================= */
-
-function getDateKey(date = new Date()) {
-
-    const year =
-        date.getFullYear();
-
-    const month =
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0");
-
-    const day =
-        String(
-            date.getDate()
-        ).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-}
-
-
-/* =========================================
-   СЧЁТЧИК ЗА СЬОГОДНІ
-========================================= */
-
-const today = getDateKey();
-
-const savedTeaDate =
-    localStorage.getItem("teaCountDate");
-
-let tea = 0;
-
-
-if (savedTeaDate === today) {
-
-    tea =
-        Number(
-            localStorage.getItem("teaCount")
-        ) || 0;
-
-} else {
-
-    tea = 0;
-
-    localStorage.setItem(
-        "teaCount",
-        "0"
-    );
-
-    localStorage.setItem(
-        "teaCountDate",
-        today
-    );
-}
-
-
-teaCount.textContent =
-    formatVolume(tea);
-/* =========================================
-   4. ІСТОРІЯ ВИПИТОГО ЧАЮ
-========================================= */
-
-/*
-    Тут зберігаємо приблизно так:
-
-    [
-        {
-            date: "2026-08-20",
-            volume: 250
-        },
-
-        {
-            date: "2026-08-20",
-            volume: 300
+        if (Number(cupVolume.value) > 1000) {
+            cupVolume.value = "1000";
         }
-    ]
-*/
+    }
+}
 
-let teaHistory =
-    JSON.parse(
-        localStorage.getItem("teaHistory")
-    ) || [];
+volumeUnit.addEventListener(
+    "change",
+    updateCupLimit
+);
 
-
-/* =========================================
-   5. ОТРИМАННЯ ДАТИ
-========================================= */
-
-
+cupVolume.addEventListener(
+    "input",
+    updateCupLimit
+);
 
 
-/* =========================================
-   6. ДОДАВАННЯ ЧАЮ
-========================================= */
+// ===============================
+// СЬОГОДНІ
+// ===============================
 
-/* =========================================
-   6. ДОДАВАННЯ ЧАЮ
-========================================= */
+function getTodayTea() {
 
-teaButton.addEventListener("click", function () {
+    const today = getDateKey();
 
-    // Беремо значення чашки
+    return teaHistory.reduce(
+        (sum, item) => {
+
+            if (item.date === today) {
+                return sum + (Number(item.volume) || 0);
+            }
+
+            return sum;
+
+        },
+        0
+    );
+}
+
+function updateTodayCounter() {
+
+    teaCount.textContent =
+        formatVolume(getTodayTea());
+}
+
+
+// ===============================
+// ДОДАТИ ЧАЙ
+// ===============================
+
+teaButton.addEventListener("click", () => {
+
     let volume = Number(cupVolume.value);
 
-    // Перевірка
     if (!Number.isFinite(volume) || volume <= 0) {
+
         alert("Вкажіть правильний об'єм чашки!");
+
+        cupVolume.focus();
+
         return;
     }
 
-    // Якщо літри — переводимо в мл
     if (volumeUnit.value === "l") {
         volume *= 1000;
     }
 
-    // ОДНЕ натискання = ОДНА чашка
-    tea = Number(tea) || 0;
-    tea += volume;
-
-    // Показуємо результат
-    teaCount.textContent = formatVolume(tea);
-
-    // Зберігаємо сьогоднішню кількість
-    localStorage.setItem("teaCount", tea);
-    localStorage.setItem("teaCountDate", getDateKey());
-
-
-    // Додаємо тільки ОДИН запис в історію
     teaHistory.push({
+
         date: getDateKey(),
-        volume: volume
+
+        volume: Math.round(volume)
+
     });
 
-    localStorage.setItem(
-        "teaHistory",
-        JSON.stringify(teaHistory)
+    saveHistory();
+
+    updateTodayCounter();
+    updateStatistics();
+    updateTeaChart();
+    updateQuests();
+
+    teaButton.classList.remove(
+        "tea-added"
     );
 
-    checkQuests();
+    void teaButton.offsetWidth;
 
-
-    // Оновлюємо статистику
-    updateStatistics();
-
-    // Оновлюємо графік
-    updateTeaChart();
-
+    teaButton.classList.add(
+        "tea-added"
+    );
 });
 
 
-/* =========================================
-   ГРАФІК ЗА ОСТАННІ 7 ДНІВ
-========================================= */
+// ===============================
+// СТАТИСТИКА
+// ===============================
 
-function updateTeaChart() {
+function startOfMonth() {
 
-    const chartArea = document.getElementById("chartArea");
-    const chartTotal = document.getElementById("chartTotal");
-
-    if (!chartArea) return;
-
-    chartArea.innerHTML = "";
-
-    const history = JSON.parse(localStorage.getItem("teaHistory")) || [];
-
-    /* Останні 7 днів */
-    const days = [];
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        days.push({
-            key: getDateKey(date),
-            date: date,
-            volume: 0
-        });
-    }
-
-    /* Знаходимо чай за кожен день */
-    history.forEach(item => {
-        const day = days.find(d => d.key === item.date);
-        if (day) {
-            day.volume += Number(item.volume) || 0;
-        }
-    });
-
-    /* 👈 ВИПРАВЛЕНО: Максимальне значення 2000 мл (відповідає шкалі 2 л у HTML) */
-    const maxVolume = Math.max(...days.map(d => d.volume), 2000);
-
-    /* Загальна кількість */
-    const total = days.reduce((sum, day) => sum + day.volume, 0);
-    chartTotal.textContent = formatVolume(total);
-
-    /* Створюємо стовпчики */
-    days.forEach(day => {
-        const column = document.createElement("div");
-        column.className = "chart-column";
-
-        const bar = document.createElement("div");
-        bar.className = "chart-bar";
-
-        /* Висота */
-        const height = (day.volume / maxVolume) * 100;
-        bar.style.height = `${Math.max(height, 2)}%`;
-
-        /* Значення */
-        const value = document.createElement("span");
-        value.className = "chart-value";
-        value.textContent = formatVolume(day.volume);
-
-        /* День */
-        const dayName = document.createElement("span");
-        dayName.className = "chart-day";
-        dayName.textContent = day.date.toLocaleDateString("uk-UA", { weekday: "short" });
-
-        bar.appendChild(value);
-        column.appendChild(bar);
-        column.appendChild(dayName);
-        chartArea.appendChild(column);
-    });
-
-}
-
-
-/* =========================================
-   7. ПОЧАТОК ПОТОЧНОГО МІСЯЦЯ
-========================================= */
-
-function getStartOfMonth() {
-
-    const now =
-        new Date();
+    const n = new Date();
 
     return new Date(
-        now.getFullYear(),
-        now.getMonth(),
+        n.getFullYear(),
+        n.getMonth(),
         1
     );
 }
 
+function startOfSixMonths() {
 
-/* =========================================
-   8. ПОЧАТОК 6 МІСЯЦІВ
-========================================= */
-
-function getStartOfSixMonths() {
-
-    const now =
-        new Date();
+    const n = new Date();
 
     return new Date(
-        now.getFullYear(),
-        now.getMonth() - 5,
+        n.getFullYear(),
+        n.getMonth() - 5,
         1
     );
 }
 
+function startOfYear() {
 
-/* =========================================
-   9. ПОЧАТОК РОКУ
-========================================= */
-
-function getStartOfYear() {
-
-    const now =
-        new Date();
+    const n = new Date();
 
     return new Date(
-        now.getFullYear(),
+        n.getFullYear(),
         0,
         1
     );
 }
 
-
-/* =========================================
-   10. ПІДРАХУНОК СТАТИСТИКИ
-========================================= */
-/* =========================================
-   РОЗРАХУНОК ВЛАСНОГО ПРОГНОЗУ (За довільний період)
-========================================= */
-function updateCustomForecast() {
-    if (!customPeriodInput || !customPeriodUnit || !customForecastValue) return;
-
-    let periodValue = Number(customPeriodInput.value) || 0;
-    const unit = customPeriodUnit.value;
-
-    // Обмеження: максимум 1 рік (12 місяців або 365 днів)
-    if (unit === "months") {
-        customPeriodInput.max = "12";
-        if (periodValue > 12) {
-            periodValue = 12;
-            customPeriodInput.value = "12";
-        }
-    } else {
-        customPeriodInput.max = "365";
-        if (periodValue > 365) {
-            periodValue = 365;
-            customPeriodInput.value = "365";
-        }
-    }
-
-    // Якщо немає даних або значення 0
-    if (periodValue <= 0 || !teaHistory || teaHistory.length === 0) {
-        customForecastValue.textContent = "0 мл";
-        return;
-    }
-
-    // Середньодобова норма (за весь час ведення історії)
-    const uniqueDays = new Set(teaHistory.map(item => item.date)).size || 1;
-    const totalVolume = teaHistory.reduce((sum, item) => sum + (Number(item.volume) || 0), 0);
-    const dailyAverage = totalVolume / uniqueDays;
-
-    // Переведення в дні (місяць вважаємо як 30 днів)
-    const totalDays = unit === "months" ? periodValue * 30 : periodValue;
-
-    // Розрахунок прогнозованого об'єму
-    const forecastVolume = dailyAverage * totalDays;
-    customForecastValue.textContent = formatVolume(forecastVolume);
-}
-
-// Події зміни значення та вибору одиниці
-if (customPeriodInput && customPeriodUnit) {
-    customPeriodInput.addEventListener("input", updateCustomForecast);
-    customPeriodUnit.addEventListener("change", updateCustomForecast);
-}
-
 function calculatePeriod(startDate) {
 
-    let total = 0;
+    return teaHistory.reduce(
+        (sum, item) => {
 
+            const d =
+                new Date(item.date + "T00:00:00");
 
-    teaHistory.forEach(item => {
+            if (d >= startDate) {
+                return sum +
+                    (Number(item.volume) || 0);
+            }
 
-        const itemDate =
-            new Date(
-                item.date + "T00:00:00"
-            );
+            return sum;
 
-
-        if (itemDate >= startDate) {
-
-            total +=
-                Number(item.volume) || 0;
-
-        }
-
-    });
-
-
-    return total;
+        },
+        0
+    );
 }
 
 
-/* Змінні прогнозу */
-const forecastMonthStat = document.getElementById("forecastMonthStat");
-const forecast6MonthsStat = document.getElementById("forecast6MonthsStat");
-const forecastYearStat = document.getElementById("forecastYearStat");
-
-/* =========================================
-   РОЗРАХУНОК ПРОГНОЗУ (Скільки буде випито)
-========================================= */
 function calculateForecast() {
-    if (!teaHistory || teaHistory.length === 0) {
-        return { month: 0, sixMonths: 0, year: 0 };
+
+    if (!teaHistory.length) {
+
+        return {
+            month: 0,
+            sixMonths: 0,
+            year: 0
+        };
     }
 
-    // Кількість днів, у які вносилися записи
-    const uniqueDays = new Set(teaHistory.map(item => item.date)).size || 1;
+    const uniqueDays =
+        new Set(
+            teaHistory.map(item => item.date)
+        ).size || 1;
 
-    // Загальний об'єм за весь час
-    const totalVolume = teaHistory.reduce((sum, item) => sum + (Number(item.volume) || 0), 0);
+    const total =
+        teaHistory.reduce(
+            (sum, item) =>
+                sum + (Number(item.volume) || 0),
+            0
+        );
 
-    // Середнє значення випитого чаю за 1 день
-    const dailyAverage = totalVolume / uniqueDays;
+    const dailyAverage =
+        total / uniqueDays;
 
     return {
-        month: dailyAverage * 30,       // 30 днів
-        sixMonths: dailyAverage * 180,  // 6 місяців (~180 днів)
-        year: dailyAverage * 365        // 1 рік (365 днів)
+
+        month: dailyAverage * 30,
+
+        sixMonths: dailyAverage * 180,
+
+        year: dailyAverage * 365
     };
 }
 
-/* =========================================
-   ОНОВЛЕННЯ СТАТИСТИКИ
-========================================= */
+
+// ===============================
+// ВЛАСНИЙ ПРОГНОЗ
+// ===============================
+
+function updateCustomForecast() {
+
+    if (
+        !customPeriodInput ||
+        !customPeriodUnit ||
+        !customForecastValue
+    ) {
+        return;
+    }
+
+    let period =
+        Number(customPeriodInput.value) || 0;
+
+    if (
+        customPeriodUnit.value === "months"
+    ) {
+
+        customPeriodInput.max = "12";
+
+        period = Math.min(period, 12);
+
+    } else {
+
+        customPeriodInput.max = "365";
+
+        period = Math.min(period, 365);
+    }
+
+    if (
+        period <= 0 ||
+        !teaHistory.length
+    ) {
+
+        customForecastValue.textContent =
+            "0 мл";
+
+        return;
+    }
+
+    const uniqueDays =
+        new Set(
+            teaHistory.map(item => item.date)
+        ).size || 1;
+
+    const total =
+        teaHistory.reduce(
+            (sum, item) =>
+                sum + (Number(item.volume) || 0),
+            0
+        );
+
+    const dailyAverage =
+        total / uniqueDays;
+
+    const days =
+        customPeriodUnit.value === "months"
+            ? period * 30
+            : period;
+
+    customForecastValue.textContent =
+        formatVolume(
+            dailyAverage * days
+        );
+}
+
+customPeriodInput.addEventListener(
+    "input",
+    updateCustomForecast
+);
+
+customPeriodUnit.addEventListener(
+    "change",
+    updateCustomForecast
+);
+
+
+// ===============================
+// ОНОВЛЕННЯ СТАТИСТИКИ
+// ===============================
+
 function updateStatistics() {
-    // 1. Фактично випито
-    const month = calculatePeriod(getStartOfMonth());
-    const sixMonths = calculatePeriod(getStartOfSixMonths());
-    const year = calculatePeriod(getStartOfYear());
 
-    monthStat.textContent = formatVolume(month);
-    sixMonthsStat.textContent = formatVolume(sixMonths);
-    yearStat.textContent = formatVolume(year);
+    monthStat.textContent =
+        formatVolume(
+            calculatePeriod(
+                startOfMonth()
+            )
+        );
 
-    // 2. Прогноз (Орієнтовно буде випито)
-    const forecast = calculateForecast();
+    sixMonthsStat.textContent =
+        formatVolume(
+            calculatePeriod(
+                startOfSixMonths()
+            )
+        );
 
-    if (forecastMonthStat) forecastMonthStat.textContent = formatVolume(forecast.month);
-    if (forecast6MonthsStat) forecast6MonthsStat.textContent = formatVolume(forecast.sixMonths);
-    if (forecastYearStat) forecastYearStat.textContent = formatVolume(forecast.year);
+    yearStat.textContent =
+        formatVolume(
+            calculatePeriod(
+                startOfYear()
+            )
+        );
+
+
+    const forecast =
+        calculateForecast();
+
+    forecastMonthStat.textContent =
+        formatVolume(
+            forecast.month
+        );
+
+    forecast6MonthsStat.textContent =
+        formatVolume(
+            forecast.sixMonths
+        );
+
+    forecastYearStat.textContent =
+        formatVolume(
+            forecast.year
+        );
 
     updateCustomForecast();
 }
 
-/* =========================================
-   11. ОНОВЛЕННЯ СТАТИСТИКИ
-========================================= */
 
-/* =========================================
-   12. СТВОРЕННЯ СНІГУ
-========================================= */
-
-function createSnow() {
-
-    snowContainer.innerHTML = "";
-
-    const amount = 50;
-
-
-    for (
-        let i = 0;
-        i < amount;
-        i++
-    ) {
-
-        const snowflake =
-            document.createElement("div");
-
-
-        snowflake.classList.add(
-            "snowflake"
-        );
-
-
-        snowflake.textContent =
-            "❄";
-
-
-        snowflake.style.left =
-            Math.random() * 100 + "%";
-
-
-        snowflake.style.fontSize =
-            Math.random() * 15 + 10 + "px";
-
-
-        snowflake.style.animationDuration =
-            Math.random() * 5 + 5 + "s";
-
-
-        snowflake.style.animationDelay =
-            Math.random() * 5 + "s";
-
-
-        snowContainer.appendChild(
-            snowflake
-        );
-
-    }
-
-}
-
-
-/* =========================================
-   13. ВИДАЛЕННЯ СНІГУ
-========================================= */
-
-function removeSnow() {
-
-    snowContainer.innerHTML = "";
-
-}
-
-
-/* =========================================
-   14. СТВОРЕННЯ ДОЩУ
-========================================= */
-
-function createRain() {
-
-    rainContainer.innerHTML = "";
-
-    const amount = 70;
-
-
-    for (
-        let i = 0;
-        i < amount;
-        i++
-    ) {
-
-        const drop =
-            document.createElement("div");
-
-
-        drop.classList.add(
-            "raindrop"
-        );
-
-
-        drop.style.left =
-            Math.random() * 100 + "%";
-
-
-        drop.style.animationDuration =
-            Math.random() * 1 + 0.5 + "s";
-
-
-        drop.style.animationDelay =
-            Math.random() * 2 + "s";
-
-
-        rainContainer.appendChild(
-            drop
-        );
-
-    }
-
-}
-
-
-/* =========================================
-   15. ВИДАЛЕННЯ ДОЩУ
-========================================= */
-
-function removeRain() {
-
-    rainContainer.innerHTML = "";
-
-}
-
-
-/* =========================================
-   16. ОТРИМАННЯ ПОГОДИ
-========================================= */
-
-async function getWeather() {
-
-    try {
-
-        const locationResponse =
-            await fetch(
-                "https://ipapi.co/json/"
-            );
-
-
-        if (!locationResponse.ok) {
-
-            throw new Error(
-                "Не вдалося отримати місцезнаходження"
-            );
-        }
-
-
-        const location =
-            await locationResponse.json();
-
-
-        const latitude =
-            location.latitude;
-
-        const longitude =
-            location.longitude;
-
-        const city =
-            location.city || "Ваше місто";
-
-
-        const weatherResponse =
-            await fetch(
-                `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code`
-            );
-
-
-        if (!weatherResponse.ok) {
-
-            throw new Error(
-                "Не вдалося отримати погоду"
-            );
-        }
-
-
-        const weather =
-            await weatherResponse.json();
-
-
-        const temperature =
-            weather.current.temperature_2m;
-
-
-        const weatherCode =
-            weather.current.weather_code;
-
-
-        updateWeather(
-            weatherCode,
-            temperature,
-            city
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Помилка отримання погоди:",
-            error
-        );
-
-
-        weatherIcon.textContent =
-            "🌤️";
-
-
-        weatherStatus.textContent =
-            "Помилка";
-
-
-        weatherTemperature.textContent =
-            "--";
-
-
-        weatherCity.textContent =
-            "Невідомо";
-
-
-        weatherText.textContent =
-            "Погода недоступна";
-
-    }
-
-}
-
-
-/* =========================================
-   17. ВИЗНАЧЕННЯ ПОГОДИ
-========================================= */
-
-function updateWeather(
-    code,
-    temperature,
-    city
-) {
-
-    removeSnow();
-
-    removeRain();
-
-
-    /* ЯСНО */
-
-    if (code === 0) {
-
-        weatherIcon.textContent =
-            "☀️";
-
-        weatherStatus.textContent =
-            "Ясно";
-
-        weatherText.textContent =
-            "Чисте небо";
-    }
-
-
-    /* ХМАРНО */
-
-    else if (
-        code === 1 ||
-        code === 2 ||
-        code === 3
-    ) {
-
-        weatherIcon.textContent =
-            "🌤️";
-
-        weatherStatus.textContent =
-            "Хмарно";
-
-        weatherText.textContent =
-            "Мінлива хмарність";
-    }
-
-
-    /* ТУМАН */
-
-    else if (
-        code === 45 ||
-        code === 48
-    ) {
-
-        weatherIcon.textContent =
-            "🌫️";
-
-        weatherStatus.textContent =
-            "Туман";
-
-        weatherText.textContent =
-            "Видимість знижена";
-    }
-
-
-    /* ДОЩ */
-
-    else if (
-        code >= 51 &&
-        code <= 67
-    ) {
-
-        weatherIcon.textContent =
-            "🌧️";
-
-        weatherStatus.textContent =
-            "Дощ";
-
-        weatherText.textContent =
-            "Опади";
-
-        createRain();
-    }
-
-
-    /* СНІГ */
-
-    else if (
-        code >= 71 &&
-        code <= 86
-    ) {
-
-        weatherIcon.textContent =
-            "❄️";
-
-        weatherStatus.textContent =
-            "Сніг";
-
-        weatherText.textContent =
-            "Снігопад";
-
-        createSnow();
-    }
-
-
-    /* ГРОЗА */
-
-    else if (code >= 95) {
-
-        weatherIcon.textContent =
-            "⛈️";
-
-        weatherStatus.textContent =
-            "Гроза";
-
-        weatherText.textContent =
-            "Гроза";
-    }
-
-
-    /* ІНШЕ */
-
-    else {
-
-        weatherIcon.textContent =
-            "🌤️";
-
-        weatherStatus.textContent =
-            "Погода";
-
-        weatherText.textContent =
-            "Невідомо";
-    }
-
-
-    /* Температура */
-
-    weatherTemperature.textContent =
-        Math.round(temperature);
-
-
-    /* Місто */
-
-    weatherCity.textContent =
-        city;
-}
-
-
-/* =========================================
-   18. ЗАПУСК
-========================================= */
-
-/* Статистика при відкритті */
-
-updateStatistics();
-
-
-/* Погода */
-
-getWeather();
-/* =========================================
-   ТЕСТ ДОЩУ
-========================================= */
-
-const rainTestButton =
-    document.getElementById("rainTestButton");
-
-let rainTestActive = false;
-
-if (rainTestButton) {
-
-    rainTestButton.addEventListener("click", () => {
-
-        rainTestActive = !rainTestActive;
-
-        if (rainTestActive) {
-
-            createRain();
-
-            rainTestButton.textContent =
-                "☀️ Вимкнути дощ";
-
-        } else {
-
-            removeRain();
-
-            rainTestButton.textContent =
-                "🌧️ Тест дощу";
-
-        }});
-
-    
-
-}
-
-
-/* =========================================
-   ГРАФІК ЗА ОСТАННІ 7 ДНІВ
-========================================= */
+// ===============================
+// ГРАФІК
+// ===============================
 
 function updateTeaChart() {
 
-    const chartArea =
-        document.getElementById("chartArea");
-
-    const chartTotal =
-        document.getElementById("chartTotal");
-
-    if (!chartArea) return;
-
+    if (!chartArea) {
+        return;
+    }
 
     chartArea.innerHTML = "";
-
-
-    /* Отримуємо історію */
-
-    const history =
-        JSON.parse(
-            localStorage.getItem("teaHistory")
-        ) || [];
-
-
-    /* Останні 7 днів */
 
     const days = [];
 
     for (let i = 6; i >= 0; i--) {
 
         const date = new Date();
+
+        date.setHours(
+            0,
+            0,
+            0,
+            0
+        );
 
         date.setDate(
             date.getDate() - i
@@ -975,13 +493,10 @@ function updateTeaChart() {
             volume: 0
 
         });
-
     }
 
 
-    /* Знаходимо чай за кожен день */
-
-    history.forEach(item => {
+    teaHistory.forEach(item => {
 
         const day =
             days.find(
@@ -992,38 +507,28 @@ function updateTeaChart() {
 
             day.volume +=
                 Number(item.volume) || 0;
-
         }
-
     });
 
-
-    /* Максимальне значення */
 
     const maxVolume =
         Math.max(
             ...days.map(
                 d => d.volume
             ),
-            500
+            2000
         );
-
-
-    /* Загальна кількість */
 
     const total =
         days.reduce(
-            (sum, day) =>
-                sum + day.volume,
+            (sum, d) =>
+                sum + d.volume,
             0
         );
-
 
     chartTotal.textContent =
         formatVolume(total);
 
-
-    /* Створюємо стовпчики */
 
     days.forEach(day => {
 
@@ -1041,16 +546,15 @@ function updateTeaChart() {
             "chart-bar";
 
 
-        /* Висота */
-
         const height =
-            (day.volume / maxVolume) * 100;
+            day.volume > 0
+                ? (day.volume / maxVolume) * 100
+                : 2;
+
 
         bar.style.height =
-            `${Math.max(height, 2)}%`;
+            `${Math.min(height, 100)}%`;
 
-
-        /* Значення */
 
         const value =
             document.createElement("span");
@@ -1061,8 +565,6 @@ function updateTeaChart() {
         value.textContent =
             formatVolume(day.volume);
 
-
-        /* День */
 
         const dayName =
             document.createElement("span");
@@ -1086,345 +588,112 @@ function updateTeaChart() {
         column.appendChild(dayName);
 
         chartArea.appendChild(column);
-
     });
-
 }
 
 
-/* =========================================
-   ЗАПУСК ГРАФІКА
-========================================= */
+// ===============================
+// ОЧИЩЕННЯ ІСТОРІЇ
+// ===============================
 
-updateTeaChart();
-/* =========================================
-   ОБМЕЖЕННЯ ВВОДУ В ПОЛІ (MAX 1L / 1000ML)
-========================================= */
-function updateCupVolumeLimits() {
-    if (volumeUnit.value === "l") {
-        cupVolume.max = "1";
-        if (Number(cupVolume.value) > 1) {
-            cupVolume.value = "1";
+$("clearHistoryButton")
+    .addEventListener("click", () => {
+
+        if (
+            !confirm(
+                "Очистити всю історію чаю та статистику?"
+            )
+        ) {
+            return;
         }
-    } else {
-        cupVolume.max = "1000";
-        if (Number(cupVolume.value) > 1000) {
-            cupVolume.value = "1000";
-        }
-    }
-}
 
-// При зміні одиниці виміру (мл/л) оновлюємо максимум
-volumeUnit.addEventListener("change", updateCupVolumeLimits);
+        teaHistory = [];
 
-// При введенні значення не даємо ввести більше максимуму
-cupVolume.addEventListener("input", () => {
-    const maxLimit = volumeUnit.value === "l" ? 1 : 1000;
-    if (Number(cupVolume.value) > maxLimit) {
-        cupVolume.value = maxLimit;
-    }
-});
+        saveHistory();
 
-/* =========================================
-   ОЧИЩЕННЯ ІСТОРІЇ ТА LOCAL STORAGE
-========================================= */
-
-const clearHistoryButton = 
-    document.getElementById("clearHistoryButton");
-
-if (clearHistoryButton) {
-
-    clearHistoryButton.addEventListener("click", () => {
-
-        const isConfirmed = confirm(
-            "Ви дійсно бажаєте очистити всю історію з LocalStorage та скинути лічильники?"
+        localStorage.removeItem(
+            "teaCount"
         );
 
-        if (isConfirmed) {
+        localStorage.removeItem(
+            "teaCountDate"
+        );
 
-            // 1. Повністю видаляємо ключі з LocalStorage
-            localStorage.removeItem("teaCount");
-            localStorage.removeItem("teaCountDate");
-            localStorage.removeItem("teaHistory");
+        updateTodayCounter();
 
-            // 2. Скидаємо змінні в пам'яті програмного коду
-            tea = 0;
-            teaHistory = [];
+        updateStatistics();
 
-            // 3. Оновлюємо лічильник за сьогодні на екрані
-            if (teaCount) {
-                teaCount.textContent = formatVolume(0);
-            }
+        updateTeaChart();
 
-            // 4. Перераховуємо статистику та оновлюємо графік
-            updateStatistics();
+        updateQuests();
 
-            if (typeof updateTeaChart === "function") {
-                updateTeaChart();
-            }
-
-            alert("LocalStorage та історію успішно очищено!");
-        }
-
-    });
-    /* =========================================
-   РОЗРАХУНОК ВЛАСНОГО ПРОГНОЗУ (За довільний період)
-========================================= */
-function updateCustomForecast() {
-    if (!customPeriodInput || !customPeriodUnit || !customForecastValue) return;
-
-    let periodValue = Number(customPeriodInput.value) || 0;
-    const unit = customPeriodUnit.value;
-
-    // Обмеження: максимум 1 рік (12 місяців або 365 днів)
-    if (unit === "months") {
-        customPeriodInput.max = "12";
-        if (periodValue > 12) {
-            periodValue = 12;
-            customPeriodInput.value = "12";
-        }
-    } else {
-        customPeriodInput.max = "365";
-        if (periodValue > 365) {
-            periodValue = 365;
-            customPeriodInput.value = "365";
-        }
-    }
-
-    // Якщо немає даних або значення 0
-    if (periodValue <= 0 || !teaHistory || teaHistory.length === 0) {
-        customForecastValue.textContent = "0 мл";
-        return;
-    }
-
-    // Середньодобова норма (за весь час ведення історії)
-    const uniqueDays = new Set(teaHistory.map(item => item.date)).size || 1;
-    const totalVolume = teaHistory.reduce((sum, item) => sum + (Number(item.volume) || 0), 0);
-    const dailyAverage = totalVolume / uniqueDays;
-
-    // Переведення в дні (місяць вважаємо як 30 днів)
-    const totalDays = unit === "months" ? periodValue * 30 : periodValue;
-
-    // Розрахунок прогнозованого об'єму
-    const forecastVolume = dailyAverage * totalDays;
-    customForecastValue.textContent = formatVolume(forecastVolume);
-}
-
-// Події зміни значення та вибору одиниці
-if (customPeriodInput && customPeriodUnit) {
-    customPeriodInput.addEventListener("input", updateCustomForecast);
-    customPeriodUnit.addEventListener("change", updateCustomForecast);
-}
-
-function calculatePeriod(startDate) {
-
-    let total = 0;
-
-
-    teaHistory.forEach(item => {
-
-        const itemDate =
-            new Date(
-                item.date + "T00:00:00"
-            );
-
-
-        if (itemDate >= startDate) {
-
-            total +=
-                Number(item.volume) || 0;
-
-        }
-
+        alert(
+            "Історію чаю очищено!"
+        );
     });
 
 
-    return total;
-}
+// ===============================
+// ПОГОДА
+// ===============================
 
-
-/* Змінні прогнозу */
-const forecastMonthStat = document.getElementById("forecastMonthStat");
-const forecast6MonthsStat = document.getElementById("forecast6MonthsStat");
-const forecastYearStat = document.getElementById("forecastYearStat");
-
-/* =========================================
-   РОЗРАХУНОК ПРОГНОЗУ (Скільки буде випито)
-========================================= */
-function calculateForecast() {
-    if (!teaHistory || teaHistory.length === 0) {
-        return { month: 0, sixMonths: 0, year: 0 };
-    }
-
-    // Кількість днів, у які вносилися записи
-    const uniqueDays = new Set(teaHistory.map(item => item.date)).size || 1;
-
-    // Загальний об'єм за весь час
-    const totalVolume = teaHistory.reduce((sum, item) => sum + (Number(item.volume) || 0), 0);
-
-    // Середнє значення випитого чаю за 1 день
-    const dailyAverage = totalVolume / uniqueDays;
-
-    return {
-        month: dailyAverage * 30,       // 30 днів
-        sixMonths: dailyAverage * 180,  // 6 місяців (~180 днів)
-        year: dailyAverage * 365        // 1 рік (365 днів)
-    };
-}
-
-/* =========================================
-   ОНОВЛЕННЯ СТАТИСТИКИ
-========================================= */
-function updateStatistics() {
-    // 1. Фактично випито
-    const month = calculatePeriod(getStartOfMonth());
-    const sixMonths = calculatePeriod(getStartOfSixMonths());
-    const year = calculatePeriod(getStartOfYear());
-
-    monthStat.textContent = formatVolume(month);
-    sixMonthsStat.textContent = formatVolume(sixMonths);
-    yearStat.textContent = formatVolume(year);
-
-    // 2. Прогноз (Орієнтовно буде випито)
-    const forecast = calculateForecast();
-
-    if (forecastMonthStat) forecastMonthStat.textContent = formatVolume(forecast.month);
-    if (forecast6MonthsStat) forecast6MonthsStat.textContent = formatVolume(forecast.sixMonths);
-    if (forecastYearStat) forecastYearStat.textContent = formatVolume(forecast.year);
-
-    updateCustomForecast();
-}
-
-
-  const weatherData = {
+const manualWeather = {
 
     rain: {
         icon: "🌧️",
         name: "Дощ",
-        temperature: "+12°C"
+        temp: "+12",
+        text: "Опади"
     },
 
     snow: {
         icon: "❄️",
         name: "Сніг",
-        temperature: "-5°C"
+        temp: "-5",
+        text: "Снігопад"
     },
 
     storm: {
         icon: "⛈️",
         name: "Гроза",
-        temperature: "+10°C"
+        temp: "+10",
+        text: "Гроза"
     },
 
     fog: {
         icon: "🌫️",
         name: "Туман",
-        temperature: "+7°C"
+        temp: "+7",
+        text: "Видимість знижена"
     }
-
 };
 
 
-/* =================================
-   ПОТОЧНА ПОГОДА
-================================= */
+let currentWeather = "clear";
 
-let currentWeather = "rain";
+let weatherTimers = [];
 
 
-/* =================================
-   ЗМІНА ПОГОДИ
-================================= */
+function stopWeatherEffects() {
 
-function changeWeather(type) {
+    weatherTimers.forEach(
+        clearInterval
+    );
 
-    if (!weatherData[type]) {
-        return;
-    }
+    weatherTimers = [];
 
-    currentWeather = type;
-
-    const weather = weatherData[type];
-
-
-    // Значок
-    document.getElementById("weatherIcon").textContent =
-        weather.icon;
-
-
-    // Назва
-    document.getElementById("weatherType").textContent =
-        weather.name;
-
-
-    // Температура
-    document.getElementById("temperature").textContent =
-        weather.temperature;
-
-
-    // Повністю очищаємо старий ефект
-    clearWeatherEffects();
-
-
-    // Запускаємо НОВУ погоду
-    startWeather(type);
-}
-
-
-/* =================================
-   ЗАПУСК ПОГОДИ
-================================= */
-
-function startWeather(type) {
-
-    if (type === "rain") {
-        startRain();
-    }
-
-    if (type === "snow") {
-        startSnow();
-    }
-
-    if (type === "storm") {
-        startStorm();
-    }
-
-    if (type === "fog") {
-        startFog();
-    }
-}
-
-
-/* =================================
-   ДОЩ — ПОСТІЙНИЙ
-================================= */
-
-let rainTimer = null;
-
-function startRain() {
-
-    // Краплі створюються постійно
-    rainTimer = setInterval(() => {
-
-        createRainDrop();
-
-        createRainDrop();
-
-        createRainDrop();
-
-    }, 70);
+    weatherEffect.innerHTML = "";
 }
 
 
 function createRainDrop() {
 
-    // Перевіряємо, що зараз саме дощ
-    if (currentWeather !== "rain" &&
-        currentWeather !== "storm") {
-
+    if (
+        currentWeather !== "rain" &&
+        currentWeather !== "storm"
+    ) {
         return;
     }
-
 
     const drop =
         document.createElement("div");
@@ -1432,52 +701,28 @@ function createRainDrop() {
     drop.className =
         "rain-drop";
 
-
     drop.style.left =
-        Math.random() * 100 + "vw";
-
+        `${Math.random() * 100}vw`;
 
     drop.style.animationDuration =
-        (0.45 + Math.random() * 0.6) + "s";
+        `${0.45 + Math.random() * 0.6}s`;
 
+    weatherEffect.appendChild(drop);
 
-    document
-        .getElementById("weatherEffect")
-        .appendChild(drop);
-
-
-    setTimeout(() => {
-
-        drop.remove();
-
-    }, 1500);
-}
-
-
-/* =================================
-   СНІГ — ПОСТІЙНИЙ
-================================= */
-
-let snowTimer = null;
-
-function startSnow() {
-
-    snowTimer = setInterval(() => {
-
-        createSnowflake();
-
-        createSnowflake();
-
-    }, 180);
+    setTimeout(
+        () => drop.remove(),
+        1600
+    );
 }
 
 
 function createSnowflake() {
 
-    if (currentWeather !== "snow") {
+    if (
+        currentWeather !== "snow"
+    ) {
         return;
     }
-
 
     const snow =
         document.createElement("div");
@@ -1485,958 +730,168 @@ function createSnowflake() {
     snow.className =
         "snowflake";
 
-    snow.textContent =
-        "❄";
-
+    snow.textContent = "❄";
 
     snow.style.left =
-        Math.random() * 100 + "vw";
-
+        `${Math.random() * 100}vw`;
 
     snow.style.fontSize =
-        (12 + Math.random() * 25) + "px";
-
+        `${12 + Math.random() * 25}px`;
 
     snow.style.animationDuration =
-        (4 + Math.random() * 5) + "s";
+        `${4 + Math.random() * 5}s`;
 
+    weatherEffect.appendChild(snow);
 
-    document
-        .getElementById("weatherEffect")
-        .appendChild(snow);
-
-
-    setTimeout(() => {
-
-        snow.remove();
-
-    }, 10000);
-}
-
-
-/* =================================
-   ГРОЗА — ПОСТІЙНА
-================================= */
-
-let stormRainTimer = null;
-let stormLightningTimer = null;
-
-
-function startStorm() {
-
-    // Постійний дощ
-    stormRainTimer = setInterval(() => {
-
-        createRainDrop();
-        createRainDrop();
-        createRainDrop();
-
-    }, 80);
-
-
-    // Блискавки
-    stormLightningTimer = setInterval(() => {
-
-        createLightning();
-
-    }, 3000);
+    setTimeout(
+        () => snow.remove(),
+        10000
+    );
 }
 
 
 function createLightning() {
 
-    if (currentWeather !== "storm") {
+    if (
+        currentWeather !== "storm"
+    ) {
         return;
     }
 
-
-    const lightning =
+    const flash =
         document.createElement("div");
 
-    lightning.className =
+    flash.className =
         "lightning";
 
+    weatherEffect.appendChild(flash);
 
-    document
-        .getElementById("weatherEffect")
-        .appendChild(lightning);
-
-
-    setTimeout(() => {
-
-        lightning.remove();
-
-    }, 500);
-
-
-    // Другий короткий спалах
-    setTimeout(() => {
-
-        if (currentWeather !== "storm") {
-            return;
-        }
-
-        const second =
-            document.createElement("div");
-
-        second.className =
-            "lightning";
-
-
-        document
-            .getElementById("weatherEffect")
-            .appendChild(second);
-
-
-        setTimeout(() => {
-
-            second.remove();
-
-        }, 400);
-
-    }, 700);
+    setTimeout(
+        () => flash.remove(),
+        500
+    );
 }
 
 
-/* =================================
-   ТУМАН — ПОСТІЙНИЙ
-================================= */
+function startWeatherEffects(type) {
 
-function startFog() {
+    stopWeatherEffects();
 
-    const fog =
-        document.createElement("div");
-
-    fog.className =
-        "fog";
+    currentWeather = type;
 
 
-    document
-        .getElementById("weatherEffect")
-        .appendChild(fog);
-}
+    if (type === "rain") {
 
+        weatherTimers.push(
+            setInterval(() => {
 
-/* =================================
-   ТЕСТ ДОЩУ
-================================= */
+                createRainDrop();
+                createRainDrop();
+                createRainDrop();
 
-function testRain() {
+            }, 70)
+        );
 
-    changeWeather("rain");
-
-}
-}
-/* =========================================================
-   СИСТЕМА КВЕСТОВ
-   ========================================================= */
-
-/* =========================================================
-   НАСТРОЙКИ
-   ========================================================= */
-
-const QUEST_STORAGE_KEY = "teaQuestProgress";
-
-
-/* =========================================================
-   КВЕСТЫ
-   ========================================================= */
-
-const quests = [
-
-    /* =====================================================
-       УРОВЕНЬ 1
-       ===================================================== */
-
-    {
-        id: 1,
-        level: 1,
-
-        title: "Перша чашка",
-        description: "Випий свою першу чашку чаю.",
-
-        goal: 1,
-        reward: 10,
-
-        icon: "🍵"
-    },
-
-    {
-        id: 2,
-        level: 1,
-
-        title: "Маленький початок",
-        description: "Випий 500 мл чаю.",
-
-        goal: 500,
-        reward: 20,
-
-        icon: "🌱"
-    },
-
-    {
-        id: 3,
-        level: 1,
-
-        title: "Чайний день",
-        description: "Випий 1 літр чаю за день.",
-
-        goal: 1000,
-        reward: 30,
-
-        icon: "☕"
-    },
-
-
-    /* =====================================================
-       УРОВЕНЬ 2
-       ===================================================== */
-
-    {
-        id: 4,
-        level: 2,
-
-        title: "Чайний ентузіаст",
-        description: "Випий 2 літри чаю за один день.",
-
-        goal: 2000,
-        reward: 50,
-
-        icon: "🔥"
-    },
-
-    {
-        id: 5,
-        level: 2,
-
-        title: "П'ять чашок",
-        description: "Випий чай 5 разів.",
-
-        goal: 5,
-        reward: 60,
-
-        icon: "🍵"
-    },
-
-    {
-        id: 6,
-        level: 2,
-
-        title: "Чайний тиждень",
-        description: "Веди історію чаю протягом 7 різних днів.",
-
-        goal: 7,
-        reward: 100,
-
-        icon: "📅"
-    },
-
-
-    /* =====================================================
-       УРОВЕНЬ 3
-       ===================================================== */
-
-    {
-        id: 7,
-        level: 3,
-
-        title: "Майстер чаю",
-        description: "Випий загалом 5 літрів чаю.",
-
-        goal: 5000,
-        reward: 150,
-
-        icon: "👑"
-    },
-
-    {
-        id: 8,
-        level: 3,
-
-        title: "Чайний марафон",
-        description: "Веди історію чаю протягом 14 різних днів.",
-
-        goal: 14,
-        reward: 200,
-
-        icon: "🏆"
-    },
-
-    {
-        id: 9,
-        level: 3,
-
-        title: "Великий запас",
-        description: "Випий загалом 10 літрів чаю.",
-
-        goal: 10000,
-        reward: 300,
-
-        icon: "💎"
     }
 
-];
+
+    else if (type === "snow") {
+
+        weatherTimers.push(
+            setInterval(() => {
+
+                createSnowflake();
+                createSnowflake();
+
+            }, 180)
+        );
+
+    }
 
 
-/* =========================================================
-   ЗБЕРЕЖЕННЯ ПРОГРЕСУ
-   ========================================================= */
+    else if (type === "storm") {
 
-let questProgress =
-    JSON.parse(
-        localStorage.getItem(QUEST_STORAGE_KEY)
-    ) || {};
+        weatherTimers.push(
+            setInterval(() => {
+
+                createRainDrop();
+                createRainDrop();
+                createRainDrop();
+
+            }, 80)
+        );
+
+        weatherTimers.push(
+            setInterval(
+                createLightning,
+                2500
+            )
+        );
+
+    }
 
 
-/* =========================================================
-   ІНІЦІАЛІЗАЦІЯ ПРОГРЕСУ
-   ========================================================= */
+    else if (type === "fog") {
 
-function initializeQuestProgress() {
+        const fog =
+            document.createElement("div");
 
-    quests.forEach(quest => {
+        fog.className =
+            "weather-fog";
 
-        if (!questProgress[quest.id]) {
-
-            questProgress[quest.id] = {
-
-                progress: 0,
-
-                completed: false,
-
-                rewardGiven: false
-
-            };
-
-        }
-
-    });
-
-    saveQuestProgress();
-
+        weatherEffect.appendChild(fog);
+    }
 }
 
 
-/* =========================================================
-   ЗБЕРЕЖЕННЯ
-   ========================================================= */
+// ===============================
+// РУЧНА ПОГОДА
+// ===============================
 
-function saveQuestProgress() {
+function showManualWeather(type) {
+
+    const w =
+        manualWeather[type];
+
+    if (!w) {
+        return;
+    }
+
+    weatherIcon.textContent =
+        w.icon;
+
+    weatherType.textContent =
+        w.name;
+
+    weatherTemperature.textContent =
+        w.temp;
+
+    weatherCity.textContent =
+        "Ручний режим";
+
+    weatherText.textContent =
+        w.text;
+
 
     localStorage.setItem(
-        QUEST_STORAGE_KEY,
-        JSON.stringify(questProgress)
+        "selectedWeather",
+        type
     );
 
+    startWeatherEffects(type);
 }
 
 
-/* =========================================================
-   ОТРИМАННЯ ІСТОРІЇ
-   ========================================================= */
-
-function getQuestHistory() {
-
-    return JSON.parse(
-        localStorage.getItem("teaHistory")
-    ) || [];
-
-}
-
-
-/* =========================================================
-   ЗАГАЛЬНИЙ ОБ'ЄМ ЧАЮ
-   ========================================================= */
-
-function getTotalTeaVolume() {
-
-    const history =
-        getQuestHistory();
-
-    return history.reduce(
-        (total, item) => {
-
-            return total +
-                (Number(item.volume) || 0);
-
-        },
-        0
-    );
-
-}
-
-
-/* =========================================================
-   КІЛЬКІСТЬ ЧАШОК
-   ========================================================= */
-
-function getTotalTeaCups() {
-
-    const history =
-        getQuestHistory();
-
-    return history.length;
-
-}
-
-
-/* =========================================================
-   КІЛЬКІСТЬ УНІКАЛЬНИХ ДНІВ
-   ========================================================= */
-
-function getUniqueTeaDays() {
-
-    const history =
-        getQuestHistory();
-
-    const days =
-        new Set(
-            history.map(
-                item => item.date
-            )
-        );
-
-    return days.size;
-
-}
-
-
-/* =========================================================
-   ОБ'ЄМ ЧАЮ ЗА СЬОГОДНІ
-   ========================================================= */
-
-function getTodayTeaVolume() {
-
-    const history =
-        getQuestHistory();
-
-    const today =
-        getDateKey();
-
-    return history.reduce(
-        (total, item) => {
-
-            if (item.date === today) {
-
-                return total +
-                    (Number(item.volume) || 0);
-
-            }
-
-            return total;
-
-        },
-        0
-    );
-
-}
-
-
-/* =========================================================
-   ПРОГРЕС КОНКРЕТНОГО КВЕСТУ
-   ========================================================= */
-
-function calculateQuestProgress(quest) {
-
-    /* -----------------------------------------
-       ПЕРШИЙ КВЕСТ
-       ----------------------------------------- */
-
-    if (quest.id === 1) {
-
-        return Math.min(
-            getTotalTeaCups(),
-            quest.goal
-        );
-
-    }
-
-
-    /* -----------------------------------------
-       500 МЛ
-       ----------------------------------------- */
-
-    if (quest.id === 2) {
-
-        return Math.min(
-            getTotalTeaVolume(),
-            quest.goal
-        );
-
-    }
-
-
-    /* -----------------------------------------
-       1 ЛІТР ЗА ДЕНЬ
-       ----------------------------------------- */
-
-    if (quest.id === 3) {
-
-        return Math.min(
-            getTodayTeaVolume(),
-            quest.goal
-        );
-
-    }
-
-
-    /* -----------------------------------------
-       2 ЛІТРИ ЗА ДЕНЬ
-       ----------------------------------------- */
-
-    if (quest.id === 4) {
-
-        return Math.min(
-            getTodayTeaVolume(),
-            quest.goal
-        );
-
-    }
-
-
-    /* -----------------------------------------
-       5 ЧАШОК
-       ----------------------------------------- */
-
-    if (quest.id === 5) {
-
-        return Math.min(
-            getTotalTeaCups(),
-            quest.goal
-        );
-
-    }
-
-
-    /* -----------------------------------------
-       7 ДНІВ
-       ----------------------------------------- */
-
-    if (quest.id === 6) {
-
-        return Math.min(
-            getUniqueTeaDays(),
-            quest.goal
-        );
-
-    }
-
-
-    /* -----------------------------------------
-       5 ЛІТРІВ
-       ----------------------------------------- */
-
-    if (quest.id === 7) {
-
-        return Math.min(
-            getTotalTeaVolume(),
-            quest.goal
-        );
-
-    }
-
-
-    /* -----------------------------------------
-       14 ДНІВ
-       ----------------------------------------- */
-
-    if (quest.id === 8) {
-
-        return Math.min(
-            getUniqueTeaDays(),
-            quest.goal
-        );
-
-    }
-
-
-    /* -----------------------------------------
-       10 ЛІТРІВ
-       ----------------------------------------- */
-
-    if (quest.id === 9) {
-
-        return Math.min(
-            getTotalTeaVolume(),
-            quest.goal
-        );
-
-    }
-
-
-    return 0;
-
-}
-
-
-/* =========================================================
-   ПЕРЕВІРКА РІВНЯ
-   ========================================================= */
-
-function isLevelUnlocked(level) {
-
-    /* Перший рівень завжди відкритий */
-
-    if (level === 1) {
-
-        return true;
-
-    }
-
-
-    /* Знаходимо квести попереднього рівня */
-
-    const previousLevel =
-        quests.filter(
-            quest =>
-                quest.level === level - 1
-        );
-
-
-    /* Якщо попереднього рівня немає */
-
-    if (previousLevel.length === 0) {
-
-        return true;
-
-    }
-
-
-    /* Всі квести попереднього рівня
-       повинні бути виконані */
-
-    return previousLevel.every(
-        quest =>
-            questProgress[quest.id] &&
-            questProgress[quest.id].completed
-    );
-
-}
-
-
-/* =========================================================
-   ОНОВЛЕННЯ ПРОГРЕСУ
-   ========================================================= */
-
-function updateQuestProgress() {
-
-    quests.forEach(quest => {
-
-        const progress =
-            calculateQuestProgress(quest);
-
-        const saved =
-            questProgress[quest.id];
-
-
-        if (!saved) {
-
-            questProgress[quest.id] = {
-
-                progress: progress,
-
-                completed: false,
-
-                rewardGiven: false
-
-            };
-
-            return;
-
-        }
-
-
-        /* Не дозволяємо перевищувати ціль */
-
-        saved.progress =
-            Math.min(
-                progress,
-                quest.goal
-            );
-
-
-        /* Перевіряємо виконання */
-
-        if (
-            saved.progress >= quest.goal &&
-            !saved.completed
-        ) {
-
-            saved.completed = true;
-
-        }
-
-    });
-
-
-    saveQuestProgress();
-
-}
-
-
-/* =========================================================
-   ФОРМАТУВАННЯ ПРОГРЕСУ
-   ========================================================= */
-
-function formatQuestProgress(
-    quest,
-    progress
-) {
-
-    /* Для об'єму */
-
-    if (
-        quest.id === 2 ||
-        quest.id === 3 ||
-        quest.id === 4 ||
-        quest.id === 7 ||
-        quest.id === 9
-    ) {
-
-        return (
-            formatVolume(progress) +
-            " / " +
-            formatVolume(quest.goal)
-        );
-
-    }
-
-
-    return (
-        progress +
-        " / " +
-        quest.goal
-    );
-
-}
-
-
-/* =========================================================
-   СТВОРЕННЯ КВЕСТУ
-   ========================================================= */
-
-function createQuestElement(quest) {
-
-    const saved =
-        questProgress[quest.id];
-
-
-    const progress =
-        saved.progress;
-
-
-    const completed =
-        saved.completed;
-
-
-    const percent =
-        Math.min(
-            (progress / quest.goal) * 100,
-            100
-        );
-
-
-    const locked =
-        !isLevelUnlocked(quest.level);
-
-
-    const questElement =
-        document.createElement("div");
-
-    questElement.className =
-        "quest";
-
-
-    if (completed) {
-
-        questElement.classList.add(
-            "completed"
-        );
-
-    }
-
-
-    if (locked) {
-
-        questElement.classList.add(
-            "locked"
-        );
-
-    }
-
-
-    /* -----------------------------------------
-       ВМІСТ
-       ----------------------------------------- */
-
-    questElement.innerHTML = `
-
-        <div class="quest-icon">
-            ${locked ? "🔒" : quest.icon}
-        </div>
-
-        <div class="quest-content">
-
-            <h3>
-                ${quest.title}
-            </h3>
-
-            <p>
-                ${
-                    locked
-                    ? "Виконайте всі квести попереднього рівня."
-                    : quest.description
-                }
-            </p>
-
-            ${
-                !locked
-                ? `
-                <div class="quest-progress">
-
-                    <div class="quest-progress-bar">
-
-                        <div
-                            class="quest-progress-fill"
-                            style="width: ${percent}%"
-                        ></div>
-
-                    </div>
-
-                    <span class="quest-progress-text">
-                        ${formatQuestProgress(quest, progress)}
-                    </span>
-
-                </div>
-                `
-                : ""
-            }
-
-        </div>
-
-        <div class="quest-reward">
-
-            🪙 ${quest.reward}
-
-        </div>
-
-        ${
-            completed
-            ? `
-                <div class="quest-completed">
-                    ✅
-                </div>
-            `
-            : ""
-        }
-
-    `;
-
-
-    return questElement;
-
-}
-
-
-/* =========================================================
-   ВІДОБРАЖЕННЯ КВЕСТІВ
-   ========================================================= */
-
-function renderQuests() {
-
-    const questsContainer =
-        document.getElementById(
-            "questsContainer"
-        );
-
-
-    if (!questsContainer) {
-
-        console.warn(
-            "Не знайдено #questsContainer"
-        );
-
-        return;
-
-    }
-
-
-    questsContainer.innerHTML = "";
-
-
-    /* Отримуємо всі рівні */
-
-    const levels =
-        [...new Set(
-            quests.map(
-                quest => quest.level
-            )
-        )];
-
-
-    levels.forEach(level => {
-
-        /* Заголовок рівня */
-
-        const levelTitle =
-            document.createElement("div");
-
-        levelTitle.className =
-            "quest-level-title";
-
-
-        const unlocked =
-            isLevelUnlocked(level);
-
-
-        levelTitle.innerHTML = `
-
-            <h2>
-
-                ${
-                    level === 1
-                    ? "🟢 Рівень 1"
-                    : level === 2
-                    ? "🔵 Рівень 2"
-                    : level === 3
-                    ? "🟣 Рівень 3"
-                    : "⭐ Рівень " + level
-                }
-
-            </h2>
-
-            <span>
-
-                ${
-                    unlocked
-                    ? "Відкрито"
-                    : "🔒 Заблоковано"
-                }
-
-            </span>
-
-        `;
-
-
-        questsContainer.appendChild(
-            levelTitle
-        );
-
-
-        /* Квести цього рівня */
-
-        const levelQuests =
-            quests.filter(
-                quest =>
-                    quest.level === level
-            );
-
-
-        levelQuests.forEach(
-            quest => {
-
-                questsContainer.appendChild(
-                    createQuestElement(quest)
+document
+    .querySelectorAll("[data-weather]")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                showManualWeather(
+                    button.dataset.weather
                 );
 
             }
@@ -2444,79 +899,1088 @@ function renderQuests() {
 
     });
 
+
+// ===============================
+// КОДИ ПОГОДИ
+// ===============================
+
+function weatherCodeInfo(code) {
+
+    if (code === 0) {
+        return [
+            "☀️",
+            "Ясно",
+            "Чисте небо"
+        ];
+    }
+
+    if ([1, 2, 3].includes(code)) {
+
+        return [
+            "🌤️",
+            "Хмарно",
+            "Мінлива хмарність"
+        ];
+    }
+
+    if ([45, 48].includes(code)) {
+
+        return [
+            "🌫️",
+            "Туман",
+            "Видимість знижена"
+        ];
+    }
+
+    if (
+        code >= 51 &&
+        code <= 67
+    ) {
+
+        return [
+            "🌧️",
+            "Дощ",
+            "Опади"
+        ];
+    }
+
+    if (
+        code >= 71 &&
+        code <= 86
+    ) {
+
+        return [
+            "❄️",
+            "Сніг",
+            "Снігопад"
+        ];
+    }
+
+    if (code >= 95) {
+
+        return [
+            "⛈️",
+            "Гроза",
+            "Гроза"
+        ];
+    }
+
+    return [
+        "🌤️",
+        "Погода",
+        "Невідомо"
+    ];
 }
 
 
-/* =========================================================
-   ЗАГАЛЬНИЙ ПРОГРЕС
-   ========================================================= */
+// ===============================
+// ОТРИМАННЯ ПОГОДИ
+// ===============================
+
+async function getWeather() {
+
+    weatherType.textContent =
+        "Завантаження";
+
+    weatherText.textContent =
+        "Отримання погоди";
+
+
+    try {
+
+        let latitude;
+        let longitude;
+
+        let city =
+            "Ваше місто";
+
+
+        try {
+
+            const position =
+                await new Promise(
+                    (resolve, reject) => {
+
+                        navigator
+                            .geolocation
+                            .getCurrentPosition(
+                                resolve,
+                                reject,
+                                {
+                                    enableHighAccuracy: false,
+                                    timeout: 5000,
+                                    maximumAge: 600000
+                                }
+                            );
+
+                    }
+                );
+
+
+            latitude =
+                position.coords.latitude;
+
+            longitude =
+                position.coords.longitude;
+
+        }
+
+
+        catch {
+
+            const locResponse =
+                await fetch(
+                    "https://ipapi.co/json/"
+                );
+
+
+            if (!locResponse.ok) {
+                throw new Error(
+                    "Не вдалося визначити місцезнаходження"
+                );
+            }
+
+
+            const loc =
+                await locResponse.json();
+
+
+            latitude =
+                loc.latitude;
+
+            longitude =
+                loc.longitude;
+
+            city =
+                loc.city ||
+                city;
+        }
+
+
+        const weatherResponse =
+            await fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code`
+            );
+
+
+        if (!weatherResponse.ok) {
+
+            throw new Error(
+                "Не вдалося отримати погоду"
+            );
+        }
+
+
+        const data =
+            await weatherResponse.json();
+
+
+        const code =
+            data.current.weather_code;
+
+
+        const temperature =
+            Math.round(
+                data.current.temperature_2m
+            );
+
+
+        if (
+            city === "Ваше місто"
+        ) {
+
+            try {
+
+                const loc =
+                    await (
+                        await fetch(
+                            "https://ipapi.co/json/"
+                        )
+                    ).json();
+
+                city =
+                    loc.city ||
+                    city;
+
+            } catch {}
+        }
+
+
+        const [
+            icon,
+            name,
+            text
+        ] =
+            weatherCodeInfo(code);
+
+
+        weatherIcon.textContent =
+            icon;
+
+        weatherType.textContent =
+            name;
+
+        weatherTemperature.textContent =
+            temperature;
+
+        weatherCity.textContent =
+            city;
+
+        weatherText.textContent =
+            text;
+
+
+        if (
+            code >= 51 &&
+            code <= 67
+        ) {
+
+            startWeatherEffects(
+                "rain"
+            );
+
+        }
+
+        else if (
+            code >= 71 &&
+            code <= 86
+        ) {
+
+            startWeatherEffects(
+                "snow"
+            );
+
+        }
+
+        else if (
+            code >= 95
+        ) {
+
+            startWeatherEffects(
+                "storm"
+            );
+
+        }
+
+        else if (
+            code === 45 ||
+            code === 48
+        ) {
+
+            startWeatherEffects(
+                "fog"
+            );
+
+        }
+
+        else {
+
+            startWeatherEffects(
+                "clear"
+            );
+        }
+
+
+    }
+
+    catch (error) {
+
+        console.warn(
+            "Погода недоступна:",
+            error
+        );
+
+
+        weatherIcon.textContent =
+            "🌤️";
+
+        weatherType.textContent =
+            "Офлайн";
+
+        weatherTemperature.textContent =
+            "--";
+
+        weatherCity.textContent =
+            "Погода недоступна";
+
+        weatherText.textContent =
+            "Використайте кнопки нижче";
+
+        stopWeatherEffects();
+    }
+}
+
+
+weatherRefresh.addEventListener(
+    "click",
+    getWeather
+);
+
+
+// ===============================
+// КВЕСТИ
+// ===============================
+
+const quests = [
+
+    {
+        id: 1,
+        level: 1,
+        title: "Перша чашка",
+        description: "Випий свою першу чашку чаю.",
+        goal: 1,
+        reward: 10,
+        icon: "🍵",
+        type: "cups"
+    },
+
+    {
+        id: 2,
+        level: 1,
+        title: "Маленький початок",
+        description: "Випий 500 мл чаю.",
+        goal: 500,
+        reward: 20,
+        icon: "🌱",
+        type: "totalVolume"
+    },
+
+    {
+        id: 3,
+        level: 1,
+        title: "Чайний день",
+        description: "Випий 1 літр чаю за день.",
+        goal: 1000,
+        reward: 30,
+        icon: "☕",
+        type: "todayVolume"
+    },
+
+    {
+        id: 4,
+        level: 2,
+        title: "Чайний ентузіаст",
+        description: "Випий 2 літри чаю за один день.",
+        goal: 2000,
+        reward: 50,
+        icon: "🔥",
+        type: "todayVolume"
+    },
+
+    {
+        id: 5,
+        level: 2,
+        title: "П'ять чашок",
+        description: "Випий чай 5 разів.",
+        goal: 5,
+        reward: 60,
+        icon: "🍵",
+        type: "cups"
+    },
+
+    {
+        id: 6,
+        level: 2,
+        title: "Чайний тиждень",
+        description: "Веди історію чаю протягом 7 різних днів.",
+        goal: 7,
+        reward: 100,
+        icon: "📅",
+        type: "days"
+    },
+
+    {
+        id: 7,
+        level: 3,
+        title: "Майстер чаю",
+        description: "Випий загалом 5 літрів чаю.",
+        goal: 5000,
+        reward: 150,
+        icon: "👑",
+        type: "totalVolume"
+    },
+
+    {
+        id: 8,
+        level: 3,
+        title: "Чайний марафон",
+        description: "Веди історію чаю протягом 14 різних днів.",
+        goal: 14,
+        reward: 200,
+        icon: "🏆",
+        type: "days"
+    },
+
+    {
+        id: 9,
+        level: 3,
+        title: "Великий запас",
+        description: "Випий загалом 10 літрів чаю.",
+        goal: 10000,
+        reward: 300,
+        icon: "💎",
+        type: "totalVolume"
+    }
+];
+
+
+// ===============================
+// ПРОГРЕС КВЕСТІВ
+// ===============================
+
+function loadQuestProgress() {
+
+    try {
+
+        const data =
+            JSON.parse(
+                localStorage.getItem(
+                    QUEST_STORAGE_KEY
+                ) || "{}"
+            );
+
+        return data &&
+            typeof data === "object"
+            ? data
+            : {};
+
+    } catch {
+
+        return {};
+    }
+}
+
+
+let questProgress =
+    loadQuestProgress();
+
+
+function saveQuestProgress() {
+
+    localStorage.setItem(
+        QUEST_STORAGE_KEY,
+        JSON.stringify(
+            questProgress
+        )
+    );
+}
+
+
+// ===============================
+// ЗНАЧЕННЯ КВЕСТІВ
+// ===============================
+
+function getTotalTeaVolume() {
+
+    return teaHistory.reduce(
+        (sum, item) =>
+            sum +
+            (Number(item.volume) || 0),
+        0
+    );
+}
+
+
+function getTotalTeaCups() {
+
+    return teaHistory.length;
+}
+
+
+function getUniqueTeaDays() {
+
+    return new Set(
+        teaHistory.map(
+            item => item.date
+        )
+    ).size;
+}
+
+
+function calculateQuestProgress(q) {
+
+    if (q.type === "cups") {
+
+        return Math.min(
+            getTotalTeaCups(),
+            q.goal
+        );
+    }
+
+
+    if (q.type === "totalVolume") {
+
+        return Math.min(
+            getTotalTeaVolume(),
+            q.goal
+        );
+    }
+
+
+    if (q.type === "todayVolume") {
+
+        return Math.min(
+            getTodayTea(),
+            q.goal
+        );
+    }
+
+
+    if (q.type === "days") {
+
+        return Math.min(
+            getUniqueTeaDays(),
+            q.goal
+        );
+    }
+
+
+    return 0;
+}
+
+
+// ===============================
+// РІВНІ
+// ===============================
+
+function isLevelUnlocked(level) {
+
+    if (level === 1) {
+        return true;
+    }
+
+    return quests
+        .filter(
+            q => q.level === level - 1
+        )
+        .every(
+            q =>
+                questProgress[q.id]?.completed
+        );
+}
+
+
+function getLevelData() {
+
+    const xp =
+        Number(
+            localStorage.getItem(
+                XP_STORAGE_KEY
+            )
+        ) || 0;
+
+
+    const level =
+        Number(
+            localStorage.getItem(
+                LEVEL_STORAGE_KEY
+            )
+        ) || 1;
+
+
+    return {
+        xp,
+        level
+    };
+}
+
+
+function saveLevelData(
+    xp,
+    level
+) {
+
+    localStorage.setItem(
+        XP_STORAGE_KEY,
+        String(xp)
+    );
+
+    localStorage.setItem(
+        LEVEL_STORAGE_KEY,
+        String(level)
+    );
+}
+
+
+// ===============================
+// XP
+// ===============================
+
+function addXP(amount) {
+
+    let {
+        xp,
+        level
+    } = getLevelData();
+
+
+    xp += amount;
+
+
+    let needed =
+        level * 100;
+
+
+    let leveledUp =
+        false;
+
+
+    while (
+        xp >= needed
+    ) {
+
+        xp -= needed;
+
+        level++;
+
+        needed =
+            level * 100;
+
+        leveledUp =
+            true;
+    }
+
+
+    saveLevelData(
+        xp,
+        level
+    );
+
+
+    if (leveledUp) {
+
+        showQuestNotification(
+            "🎉 Новий рівень!",
+            `Тепер у тебе рівень ${level}!`
+        );
+    }
+}
+
+
+// ===============================
+// НАЗВА РІВНЯ
+// ===============================
+
+function getLevelTitle(level) {
+
+    if (level >= 10) {
+        return "Легенда чаю";
+    }
+
+    if (level >= 7) {
+        return "Чайний геній";
+    }
+
+    if (level >= 5) {
+        return "Майстер";
+    }
+
+    if (level >= 3) {
+        return "Знавець чаю";
+    }
+
+    if (level >= 2) {
+        return "Ентузіаст";
+    }
+
+    return "Новачок";
+}
+
+
+// ===============================
+// ІНТЕРФЕЙС РІВНЯ
+// ===============================
+
+function updateLevelUI() {
+
+    const {
+        xp,
+        level
+    } = getLevelData();
+
+
+    const needed =
+        level * 100;
+
+
+    $("teaLevel").textContent =
+        level;
+
+
+    $("teaLevelTitle").textContent =
+        getLevelTitle(level);
+
+
+    $("teaXP").textContent =
+        xp;
+
+
+    $("teaXPNeeded").textContent =
+        needed;
+
+
+    $("teaXPBar").style.width =
+        `${Math.min(
+            (xp / needed) * 100,
+            100
+        )}%`;
+}
+
+
+// ===============================
+// ПОВІДОМЛЕННЯ
+// ===============================
+
+function showQuestNotification(
+    title,
+    text
+) {
+
+    const box =
+        $("questNotification");
+
+
+    $("questNotificationTitle")
+        .textContent =
+        title;
+
+
+    $("questNotificationText")
+        .textContent =
+        text;
+
+
+    box.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        showQuestNotification.timer
+    );
+
+
+    showQuestNotification.timer =
+        setTimeout(
+            () =>
+                box.classList.remove(
+                    "show"
+                ),
+            3500
+        );
+}
+
+
+// ===============================
+// ОНОВЛЕННЯ ПРОГРЕСУ
+// ===============================
+
+function updateQuestProgress() {
+
+    quests.forEach(q => {
+
+        if (!questProgress[q.id]) {
+
+            questProgress[q.id] = {
+
+                progress: 0,
+
+                completed: false,
+
+                rewardGiven: false
+            };
+        }
+
+
+        const saved =
+            questProgress[q.id];
+
+
+        saved.progress =
+            calculateQuestProgress(q);
+
+
+        if (
+            saved.progress >= q.goal &&
+            !saved.completed
+        ) {
+
+            saved.completed =
+                true;
+        }
+
+
+        if (
+            saved.completed &&
+            !saved.rewardGiven
+        ) {
+
+            saved.rewardGiven =
+                true;
+
+
+            addXP(
+                q.reward
+            );
+
+
+            showQuestNotification(
+                "🏆 Квест виконано!",
+                `+${q.reward} XP — ${q.title}`
+            );
+        }
+    });
+
+
+    saveQuestProgress();
+}
+
+
+// ===============================
+// ВИВІД КВЕСТІВ
+// ===============================
+
+function formatQuestProgress(
+    q,
+    value
+) {
+
+    if (
+        q.type === "totalVolume" ||
+        q.type === "todayVolume"
+    ) {
+
+        return `${formatVolume(value)} / ${formatVolume(q.goal)}`;
+    }
+
+
+    return `${value} / ${q.goal}`;
+}
+
+
+function renderQuests() {
+
+    const list =
+        $("questsList");
+
+
+    list.innerHTML = "";
+
+
+    const levels =
+        [
+            ...new Set(
+                quests.map(
+                    q => q.level
+                )
+            )
+        ];
+
+
+    levels.forEach(level => {
+
+        const unlocked =
+            isLevelUnlocked(level);
+
+
+        const title =
+            document.createElement(
+                "div"
+            );
+
+
+        title.className =
+            "quest-level-title";
+
+
+        title.innerHTML = `
+            <h2>
+                ${
+                    level === 1
+                        ? "🟢"
+                        : level === 2
+                            ? "🔵"
+                            : "🟣"
+                }
+                Рівень ${level}
+            </h2>
+
+            <span>
+                ${
+                    unlocked
+                        ? "Відкрито"
+                        : "🔒 Заблоковано"
+                }
+            </span>
+        `;
+
+
+        list.appendChild(
+            title
+        );
+
+
+        quests
+            .filter(
+                q => q.level === level
+            )
+            .forEach(q => {
+
+                const saved =
+                    questProgress[q.id];
+
+
+                const progress =
+                    saved?.progress || 0;
+
+
+                const completed =
+                    !!saved?.completed;
+
+
+                const locked =
+                    !unlocked;
+
+
+                const percent =
+                    Math.min(
+                        (progress / q.goal) * 100,
+                        100
+                    );
+
+
+                const el =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                el.className =
+                    `quest${
+                        completed
+                            ? " completed"
+                            : ""
+                    }${
+                        locked
+                            ? " locked"
+                            : ""
+                    }`;
+
+
+                el.innerHTML = `
+
+                    <div class="quest-icon">
+
+                        ${
+                            locked
+                                ? "🔒"
+                                : q.icon
+                        }
+
+                    </div>
+
+
+                    <div class="quest-content">
+
+                        <h3>
+                            ${q.title}
+                        </h3>
+
+
+                        <p>
+
+                            ${
+                                locked
+                                    ? "Виконайте всі квести попереднього рівня."
+                                    : q.description
+                            }
+
+                        </p>
+
+
+                        ${
+                            locked
+                                ? ""
+                                : `
+
+                                    <div class="quest-progress">
+
+                                        <div class="quest-progress-bar">
+
+                                            <div
+                                                class="quest-progress-fill"
+                                                style="width:${percent}%"
+                                            ></div>
+
+                                        </div>
+
+
+                                        <span class="quest-progress-text">
+
+                                            ${
+                                                formatQuestProgress(
+                                                    q,
+                                                    progress
+                                                )
+                                            }
+
+                                        </span>
+
+                                    </div>
+                                `
+                        }
+
+                    </div>
+
+
+                    <div class="quest-reward">
+
+                        🪙 ${q.reward} XP
+
+                    </div>
+
+
+                    ${
+                        completed
+                            ? '<div class="quest-completed">✅</div>'
+                            : ""
+                    }
+
+                `;
+
+
+                list.appendChild(
+                    el
+                );
+            });
+    });
+}
+
+
+// ===============================
+// ЛІЧИЛЬНИК КВЕСТІВ
+// ===============================
 
 function updateQuestStats() {
 
-    const total =
-        quests.length;
-
-
     const completed =
         quests.filter(
-            quest =>
-                questProgress[quest.id] &&
-                questProgress[quest.id].completed
+            q =>
+                questProgress[q.id]
+                    ?.completed
         ).length;
 
 
-    const progressElement =
-        document.getElementById(
-            "questsCompleted"
-        );
+    $("questsCompleted")
+        .textContent =
+        completed;
 
 
-    const totalElement =
-        document.getElementById(
-            "questsTotal"
-        );
-
-
-    const progressBar =
-        document.getElementById(
-            "questsProgress"
-        );
-
-
-    if (progressElement) {
-
-        progressElement.textContent =
-            completed;
-
-    }
-
-
-    if (totalElement) {
-
-        totalElement.textContent =
-            total;
-
-    }
-
-
-    if (progressBar) {
-
-        const percent =
-            total > 0
-            ? (completed / total) * 100
-            : 0;
-
-        progressBar.style.width =
-            percent + "%";
-
-    }
-
+    $("questsTotal")
+        .textContent =
+        quests.length;
 }
 
-
-/* =========================================================
-   ОНОВЛЕННЯ ВСІЄЇ СИСТЕМИ
-   ========================================================= */
 
 function updateQuests() {
 
@@ -2526,107 +1990,87 @@ function updateQuests() {
 
     updateQuestStats();
 
+    updateLevelUI();
 }
 
 
-/* =========================================================
-   СКИДАННЯ КВЕСТІВ
-   ========================================================= */
+// ===============================
+// СКИДАННЯ КВЕСТІВ
+// ===============================
 
-function resetQuests() {
-
-    const confirmed =
-        confirm(
-            "Ви дійсно хочете скинути весь прогрес квестів?"
-        );
-
-
-    if (!confirmed) {
-
-        return;
-
-    }
-
-
-    localStorage.removeItem(
-        QUEST_STORAGE_KEY
-    );
-
-
-    questProgress = {};
-
-
-    initializeQuestProgress();
-
-    updateQuests();
-
-
-    alert(
-        "Прогрес квестів успішно скинуто!"
-    );
-
-}
-
-
-/* =========================================================
-   КНОПКА СКИДАННЯ
-   ========================================================= */
-
-const resetQuestsButton =
-    document.getElementById(
-        "resetQuestsButton"
-    );
-
-
-if (resetQuestsButton) {
-
-    resetQuestsButton.addEventListener(
-        "click",
-        resetQuests
-    );
-
-}
-
-
-/* =========================================================
-   СЛУХАЧ ДОДАВАННЯ ЧАЮ
-   ========================================================= */
-
-/*
-   Коли користувач додає чай,
-   квести автоматично перевіряються.
-*/
-
-if (teaButton) {
-
-    teaButton.addEventListener(
+$("resetQuestsButton")
+    .addEventListener(
         "click",
         () => {
 
-            /*
-               Невелика затримка,
-               щоб teaHistory вже встиг
-               зберегтися.
-            */
+            if (
+                !confirm(
+                    "Скинути весь прогрес квестів і XP?"
+                )
+            ) {
+                return;
+            }
 
-            setTimeout(() => {
 
-                updateQuests();
+            questProgress = {};
 
-            }, 50);
 
+            localStorage.removeItem(
+                QUEST_STORAGE_KEY
+            );
+
+
+            localStorage.removeItem(
+                XP_STORAGE_KEY
+            );
+
+
+            localStorage.removeItem(
+                LEVEL_STORAGE_KEY
+            );
+
+
+            updateQuests();
+
+
+            alert(
+                "Прогрес квестів скинуто!"
+            );
         }
     );
 
-}
 
+// ===============================
+// ЗАПУСК САЙТУ
+// ===============================
 
-/* =========================================================
-   ЗАПУСК
-   ========================================================= */
+updateCupLimit();
 
-initializeQuestProgress();
+updateTodayCounter();
+
+updateStatistics();
+
+updateTeaChart();
 
 updateQuests();
 
 
+const savedWeather =
+    localStorage.getItem(
+        "selectedWeather"
+    );
+
+
+if (
+    savedWeather &&
+    manualWeather[savedWeather]
+) {
+
+    showManualWeather(
+        savedWeather
+    );
+
+} else {
+
+    getWeather();
+}
